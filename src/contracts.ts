@@ -1,3 +1,6 @@
+import type { LoginInput } from "./models/dto/input/login.dto.js";
+import type { LoginOutput } from "./models/dto/output/login.dto.js";
+
 export type BurmProfileResponse = {
   burmProfileId: string;
   burmUserId: string;
@@ -52,4 +55,11 @@ export type LoginAdapters = {
 
   // BURM: Block user profile
   patchBurmProfilesBlocked: (userId: string) => Promise<void>;
+};
+
+export type LoginExecutionAdapter = (input: LoginInput) => Promise<LoginOutput>;
+
+// Decorated object expected by routes/controller at runtime.
+export type LoginControllerAdapters = LoginAdapters & {
+  loginUseCase: LoginExecutionAdapter;
 };

@@ -1,4 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
+import type { LoginControllerAdapters } from "../contracts.js";
 import { buildLoginController } from "../controllers/login.controller.js";
 import { LoginInputSchema } from "../models/dto/input/login.dto.js";
 import { LoginBadRequestError } from "../errors/login.errors.js";
@@ -13,7 +14,10 @@ export const loginRoutes: FastifyPluginAsync = async (app) => {
     context: "Initializing route POST /login",
   });
 
-  const adapters = (app as any).loginAdapters || null;
+  const decoratedApp = app as typeof app & {
+    loginAdapters?: LoginControllerAdapters;
+  };
+  const adapters = decoratedApp.loginAdapters ?? null;
 
   if (!adapters) {
     moduleLogger.error({
