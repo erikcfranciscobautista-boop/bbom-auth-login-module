@@ -1,9 +1,10 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { LoginInput } from "../models/dto/input/login.dto.js";
+import type { LoginControllerAdapters } from "../contracts.js";
 import { LoginError } from "../errors/login.errors.js";
 import { moduleLogger } from "../lib/module-logger.js";
 
-export function buildLoginController(adapters: any) {
+export function buildLoginController(adapters: LoginControllerAdapters) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     const input = request.body as LoginInput;
 
@@ -49,7 +50,7 @@ export function buildLoginController(adapters: any) {
           message: "Login use case not implemented. Provide 'loginUseCase' via adapters.",
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle typed LoginError exceptions
       if (error instanceof LoginError) {
         moduleLogger.warn({
