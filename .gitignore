@@ -1,4 +1,5 @@
 node_modules/
+dist/
 *.log
 
 # Internal AI agent instructions and UUAA context (sensitive: DB schemas, business rules)
@@ -88,6 +89,7 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
+dist
 .output
 
 # Gatsby files
