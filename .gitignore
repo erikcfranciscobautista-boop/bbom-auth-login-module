@@ -1,3 +1,12 @@
+node_modules/
+dist/
+*.log
+
+# Internal AI agent instructions and UUAA context (sensitive: DB schemas, business rules)
+.github/agents/
+
+# Internal scaffolding scripts (not part of the publishable module)
+scripts/
 # Logs
 logs
 *.log

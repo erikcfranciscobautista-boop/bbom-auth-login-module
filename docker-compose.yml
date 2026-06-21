@@ -1,0 +1,24 @@
+services:
+  bbom-auth-login-module:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    command: npm run start:test
+    develop:
+      watch:
+      - action: sync
+        path: ./src
+        target: /app/src
+      - action: rebuild
+        path: package.json
+
+  bbom-auth-login-tests:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: builder
+    command: npm run test:unit
+    profiles:
+      - test
