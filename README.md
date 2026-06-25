@@ -60,32 +60,77 @@ Donde:
 
 ## Integración en Orquestador
 
-1. Implementa los 6 adaptadores de BURM y BCPM
-2. Inyecta `loginUseCase` (usa `buildLoginUseCase()`)
-3. Decora la app con `loginAdapters`
-4. Registra las rutas
+### 1) Instalar como dependencia
+
+Desde registry (si está publicado):
+
+```bash
+npm install @uuaa/bbom-auth-login-module
+```
+
+Desde GitHub:
+
+```bash
+npm install github:BAUHEZ_COMPANY/UUAAS/BBOM-MODULES/bbom-auth-login-module
+```
+
+Con tag/branch específico:
+
+```bash
+npm install github:BAUHEZ_COMPANY/UUAAS/BBOM-MODULES/bbom-auth-login-module#v0.1.2
+```
+
+### 2) Integración recomendada (simple)
+
+Solo implementa los 6 adaptadores y pásalos en el registro del plugin. El módulo construye internamente el use case.
 
 ```typescript
-import { loginRoutes } from "@uuaa/bbom/auth-login";
-import { buildLoginUseCase } from "@uuaa/bbom/auth-login/services/login.implementation";
+import { loginRoutes, type LoginAdapters } from "@uuaa/bbom-auth-login-module";
 
-const adapters = {
-  postBurmProfilesIdentifier: (u, p) => burmClient.validateCredentials(u, p),
-  getBcpmStatusesStatusId: (id) => bcpmClient.getStatus(id),
-  getBcpmPermissionsRoleId: (id) => bcpmClient.getPermissions(id),
-  postBurmCredentialsGenerateToken: (uid, rid, did, perms) => burmClient.generateToken(...),
-  patchBurmCredentialsIncrementAttempts: (uid) => burmClient.incrementAttempts(uid),
-  patchBurmProfilesBlocked: (uid) => burmClient.blockProfile(uid),
+const adapters: LoginAdapters = {
+  postBurmProfilesIdentifier: (username, password) =>
+    burmClient.validateCredentials(username, password),
+  getBcpmStatusesStatusId: (statusId) => bcpmClient.getStatus(statusId),
+  getBcpmPermissionsRoleId: (roleId) => bcpmClient.getPermissions(roleId),
+  postBurmCredentialsGenerateToken: (userId, roleId, departmentId, permissions) =>
+    burmClient.generateToken(userId, roleId, departmentId, permissions),
+  patchBurmCredentialsIncrementAttempts: (userId) =>
+    burmClient.incrementAttempts(userId),
+  patchBurmProfilesBlocked: (userId) => burmClient.blockProfile(userId),
 };
 
-const loginUseCase = buildLoginUseCase();
-const adapterWithUseCase = {
+await app.register(loginRoutes, {
+  adapters,
+  routePath: "/login", // opcional (default)
+});
+```
+
+### 3) Integración legacy (compatible)
+
+También funciona por decorador si tu orquestador ya usa ese patrón:
+
+```typescript
+app.decorate("loginAdapters", {
   ...adapters,
-  loginUseCase: (input) => loginUseCase(input, adapters),
-};
+  loginUseCase: (input) => buildLoginUseCase()(input, adapters),
+});
 
-app.decorate("loginAdapters", adapterWithUseCase);
 await app.register(loginRoutes);
+```
+
+### 4) Logger opcional
+
+Si no pasas logger, el módulo usa `app.log` de Fastify automáticamente.
+
+```typescript
+await app.register(loginRoutes, {
+  adapters,
+  logger: {
+    info: (entry) => app.log.info({ context: entry.context }, entry.message),
+    warn: (entry) => app.log.warn({ context: entry.context }, entry.message),
+    error: (entry) => app.log.error({ context: entry.context }, entry.message),
+  },
+});
 ```
 
 ## Testing Local

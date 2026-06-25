@@ -11,14 +11,53 @@ export type LogContext = {
   context: string;
 };
 
+type LogEntry = {
+  component: string;
+  level: LogType;
+  time: string;
+  message: string;
+  context: LogContext;
+};
+
+export type ModuleLoggerAdapter = {
+  info?: (entry: LogEntry) => void;
+  warn?: (entry: LogEntry) => void;
+  error?: (entry: LogEntry) => void;
+};
+
+let loggerAdapter: ModuleLoggerAdapter | null = null;
+
+export const configureModuleLogger = (adapter?: ModuleLoggerAdapter): void => {
+  loggerAdapter = adapter ?? null;
+};
+
 const emit = (type: LogType, ctx: LogContext): void => {
-  const entry = {
-    type,
+  const baseEntry = {
+    component: COMPONENT_NAME,
+    level: type,
     time: new Date().toISOString(),
     message: `[${ctx.folder} - ${ctx.class} - ${ctx.method}] - ${ctx.context}`,
+    context: ctx,
   };
 
-  const line = JSON.stringify(entry);
+  if (loggerAdapter) {
+    if (type === "ERROR" && loggerAdapter.error) {
+      loggerAdapter.error(baseEntry);
+      return;
+    }
+
+    if (type === "WARN" && loggerAdapter.warn) {
+      loggerAdapter.warn(baseEntry);
+      return;
+    }
+
+    if (type === "INFO" && loggerAdapter.info) {
+      loggerAdapter.info(baseEntry);
+      return;
+    }
+  }
+
+  const line = JSON.stringify(baseEntry);
 
   if (type === "ERROR") {
     console.error(line);

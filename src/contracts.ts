@@ -1,5 +1,6 @@
 import type { LoginInput } from "./models/dto/input/login.dto.js";
 import type { LoginOutput } from "./models/dto/output/login.dto.js";
+import type { ModuleLoggerAdapter } from "./lib/module-logger.js";
 
 export type BurmProfileResponse = {
   burmProfileId: string;
@@ -62,4 +63,18 @@ export type LoginExecutionAdapter = (input: LoginInput) => Promise<LoginOutput>;
 // Decorated object expected by routes/controller at runtime.
 export type LoginControllerAdapters = LoginAdapters & {
   loginUseCase: LoginExecutionAdapter;
+};
+
+export type LoginRoutesPluginOptions = {
+  // Preferred integration path: provide adapters directly when registering routes.
+  adapters?: LoginAdapters;
+
+  // Optional custom execution adapter. If omitted, the module builds one from adapters.
+  loginUseCase?: LoginExecutionAdapter;
+
+  // Optional route override. Defaults to /login.
+  routePath?: string;
+
+  // Optional logger adapter. Falls back to app.log if available.
+  logger?: ModuleLoggerAdapter;
 };

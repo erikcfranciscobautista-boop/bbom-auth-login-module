@@ -1,10 +1,14 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { LoginInput } from "../models/dto/input/login.dto.js";
-import type { LoginControllerAdapters } from "../contracts.js";
+import type { LoginExecutionAdapter } from "../contracts.js";
 import { LoginError } from "../errors/login.errors.js";
 import { moduleLogger } from "../lib/module-logger.js";
 
-export function buildLoginController(adapters: LoginControllerAdapters) {
+type LoginControllerDeps = {
+  loginUseCase: LoginExecutionAdapter;
+};
+
+export function buildLoginController({ loginUseCase }: LoginControllerDeps) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     const input = request.body as LoginInput;
 
@@ -16,40 +20,23 @@ export function buildLoginController(adapters: LoginControllerAdapters) {
     });
 
     try {
-      // Expect the orchestrator to provide the actual use case implementation
-      if (adapters && typeof adapters.loginUseCase === "function") {
-        moduleLogger.info({
-          folder: "CONTROLLER",
-          class: "LoginController",
-          method: "buildLoginController",
-          context: "if loginUseCase → Adapter call loginUseCase",
-        });
-
-        const result = await adapters.loginUseCase(input);
-
-        moduleLogger.info({
-          folder: "CONTROLLER",
-          class: "LoginController",
-          method: "buildLoginController",
-          context: "loginUseCase → response success | status: 200",
-        });
-
-        return reply.status(200).send(result);
-      }
-
-      moduleLogger.warn({
+      moduleLogger.info({
         folder: "CONTROLLER",
         class: "LoginController",
         method: "buildLoginController",
-        context: "if loginUseCase → adapter not configured | status: 501",
+        context: "Adapter call loginUseCase",
       });
 
-      return reply.status(501).send({
-        errorCode: "BBOM-INTERNAL",
-        details: {
-          message: "Login use case not implemented. Provide 'loginUseCase' via adapters.",
-        },
+      const result = await loginUseCase(input);
+
+      moduleLogger.info({
+        folder: "CONTROLLER",
+        class: "LoginController",
+        method: "buildLoginController",
+        context: "loginUseCase → response success | status: 200",
       });
+
+      return reply.status(200).send(result);
     } catch (error: unknown) {
       // Handle typed LoginError exceptions
       if (error instanceof LoginError) {
