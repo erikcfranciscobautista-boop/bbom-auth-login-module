@@ -78,3 +78,6 @@ export type LoginRoutesPluginOptions = {
   // Optional logger adapter. Falls back to app.log if available.
   logger?: ModuleLoggerAdapter;
 };
+
+// Stable public name for consumers.
+export type LoginRouteOptions = LoginRoutesPluginOptions;
