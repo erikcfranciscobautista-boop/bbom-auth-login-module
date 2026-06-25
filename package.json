@@ -19,6 +19,7 @@
     "start:test": "node dist/scripts/run-local.js",
     "start:test:dev": "node --loader ts-node/esm scripts/run-local.ts",
     "build": "tsc -p .",
+    "prepare": "npm run build",
     "prepack": "npm run build",
     "test:unit": "TS_NODE_PROJECT=tsconfig.test.json node --loader ts-node/esm --test test/**/*.test.ts",
     "scaffold:module": "node --loader ts-node/esm scripts/scaffold-module.ts",
