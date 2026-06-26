@@ -12,7 +12,7 @@
     }
   },
   "files": [
-    "dist/src",
+    "dist",
     "README.md"
   ],
   "scripts": {
