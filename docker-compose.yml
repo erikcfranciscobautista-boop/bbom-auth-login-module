@@ -5,7 +5,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3000"
-    command: npm run start:test
+    # 👇 CORRECCIÓN 1: Cambiamos al script de desarrollo que sí existe
+    command: npm run start:test:dev
+    # 👇 CORRECCIÓN 2: Montamos un volumen general para que 'test' y 'scripts' estén accesibles
+    volumes:
+      - .:/app
+      - /app/node_modules
     develop:
       watch:
       - action: sync
@@ -18,7 +23,10 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      target: builder
-    command: npm run test:unit
+    # 👇 CORRECCIÓN 3: Cambiamos al comando aislado que quieres probar de inmediato
+    command: npm run test:isolated
+    volumes:
+      - .:/app
+      - /app/node_modules
     profiles:
       - test

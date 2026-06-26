@@ -1,5 +1,5 @@
 {
-  "name": "@uuaa/bbom-auth-login-module",
+  "name": "@uuaas-bbom/bbom-auth-login",
   "version": "0.1.2",
   "private": false,
   "type": "module",
@@ -16,22 +16,15 @@
     "README.md"
   ],
   "scripts": {
-    "start:test": "node dist/scripts/run-local.js",
-    "start:test:dev": "node --loader ts-node/esm scripts/run-local.ts",
-    "build": "tsc -p .",
-    "prepare": "npm run build",
-    "prepack": "npm run build",
-    "test:unit": "TS_NODE_PROJECT=tsconfig.test.json node --loader ts-node/esm --test test/**/*.test.ts",
-    "scaffold:module": "node --loader ts-node/esm scripts/scaffold-module.ts",
-    "docker:local": "docker compose up --build bbom-auth-login-module",
-    "docker:test:unit": "docker compose --profile test run --rm bbom-auth-login-tests"
+    "build": "tsc -p tsconfig.build.json",
+    "start:test:dev": "node --loader ts-node/esm test/scripts/run-local.ts"
   },
   "dependencies": {
-    "fastify": "^4.24.0",
     "jsonwebtoken": "^9.0.0",
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "fastify": "^4.24.0",
     "typescript": "^5.2.2",
     "ts-node": "^10.9.1",
     "@types/node": "^20.4.2",

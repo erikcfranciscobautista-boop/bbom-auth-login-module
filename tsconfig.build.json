@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,      // Genera los archivos .d.ts para que el integrador tenga tipado
+    "declarationMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["test/**/*", "src/**/*.spec.ts"]
+}
