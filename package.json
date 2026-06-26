@@ -1,5 +1,5 @@
 {
-  "name": "@uuaas-bbom/bbom-auth-login",
+  "name": "@uuaas-bbom/bbom-auth-login-module",
   "version": "0.1.2",
   "private": false,
   "type": "module",
