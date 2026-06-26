@@ -4,3 +4,4 @@ export { AuthLoginInSchema } from './contracts/models/authLogin/authLogin.in.dto
 export type { AuthLoginInDto } from './contracts/models/authLogin/authLogin.in.dto.js';
 export type { AuthLoginOutDto } from './contracts/models/authLogin/authLogin.out.dto.js';
 export type { ExecuteAuthLoginOptions } from './contracts/options/authLogin.options.js';
+export { PostBurmProfileIdentifierPort } from './contracts/options/ports/burm.ports.js';
