@@ -1,12 +1,12 @@
 services:
-  bbom-auth-login-module:
+  bbom-auth-login-module-localhost:
     build: 
       context: ./
       dockerfile: Dockerfile
     ports:
       - "3001:3000"
     # 👇 CORRECCIÓN 1: Cambiamos al script de desarrollo que sí existe
-    command: npm run start:test:dev
+    command: npm run localhost
     # 👇 CORRECCIÓN 2: Montamos un volumen general para que 'test' y 'scripts' estén accesibles
     volumes:
       - .:/app
