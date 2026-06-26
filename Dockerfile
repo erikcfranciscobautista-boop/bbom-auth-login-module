@@ -2,17 +2,16 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copiamos manifiestos e instalamos dependencias completas
+# 1. Copiamos los manifiestos
 COPY package*.json ./
+
+# 2. Instalamos dependencias limpiamente
 RUN npm install
 
-# Copiamos el resto del código
+# 3. Copiamos todo el código fuente (incluyendo src/, test/ y tsconfigs)
 COPY . .
-
-# 🔥 Ejecutamos el build de TypeScript en la fase de construcción de la imagen
-RUN npm run build
 
 EXPOSE 3000
 
-# 🚀 Cambiamos el comando por defecto para que corra el código JavaScript compilado
-CMD ["node", "dist/index.js"]
+# 4. Arranca el playground local leyendo directamente los archivos TS en caliente
+CMD ["npm", "run", "start:test:dev"]
