@@ -17,7 +17,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "start:test:dev": "node --loader ts-node/esm test/scripts/run-local.ts"
+    "start:test:dev": "node --loader ts-node/esm test/scripts/run-local.ts",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "jsonwebtoken": "^9.0.0",
