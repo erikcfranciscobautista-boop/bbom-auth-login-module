@@ -1,10 +1,12 @@
-import { AuthLoginInSchema } from "../models/authLogin/authLogin.in.dto.js";
-
+// En tu módulo de definición
 export const SwaggerAuthLoginInSchema = {
-    tags : "login",
-    properties: {
+    tags: ["login"], // Debe ser un arreglo
+    body: {
         type: "object",
-        properties : AuthLoginInSchema,
+        properties: {
+            username: { type: "string" },
+            password: { type: "string" }
+        },
+        required: ["username", "password"],
     },
-    required: ["username", "password"],
 };
