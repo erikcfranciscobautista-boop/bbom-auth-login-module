@@ -7,3 +7,4 @@ export type { ExecuteAuthLoginOptions } from './contracts/options/authLogin.opti
 export { PostBurmProfileIdentifierPort } from './contracts/options/ports/burm.ports.js';
 export { BurmProfileIdentifierDto } from './contracts/models/burm/profileIdentifier.dto.js';
 export { BurmProfileIdentifierSchema } from './contracts/models/burm/profileIdentifier.dto.js';
+export { SwaggerAuthLoginInSchema } from './contracts/swagger/authLogin.swagger.js';
