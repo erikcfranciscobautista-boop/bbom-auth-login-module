@@ -1,4 +1,4 @@
-export { executeAuthLoginModule } from './routes/authLogin.route.js';
+export { executeAuthLoginModule } from './main.js';
 export { authLoginMiddleware } from './middleware/authLogin.middleware.js';
 export { AuthLoginInSchema } from './contracts/models/authLogin/authLogin.in.dto.js';
 export type { AuthLoginInDto } from './contracts/models/authLogin/authLogin.in.dto.js';
