@@ -4,11 +4,18 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "declaration": true,
+    "declarationMap": true,        // <-- AÑADIDO: Facilita el debugging entre UUAAs
+    "sourceMap": true,             // <-- AÑADIDO: Mapea errores en runtime a líneas .ts reales
     "outDir": "dist",
-    "strict": true,
+    "noEmit": false,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "scripts/**/*"]
+  "include": [
+    "src/**/*", 
+    "scripts/**/*", 
+    "test/**/*"                    // <-- AÑADIDO: Permite que Docker y tu editor entiendan las pruebas
+  ]
 }

@@ -1,3 +1,5 @@
+//"prepare": "node -e \"if(require('fs').existsSync('tsconfig.build.json')) require('child_process').execSync('npm run build', {stdio: 'inherit'})\""
+
 # bbom-auth-login-module
 
 Módulo de orquestación de login para BBOM (Business Business Orchestration Module). Coordina la validación de identidad con BURM, verifica estados administrativos con BCPM y genera JWT enriquecidos con permisos.
