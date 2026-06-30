@@ -1,14 +1,15 @@
-import {AuthLoginInDto} from '../contracts/models/authLogin/authLogin.in.dto.js';
-import {AuthLoginOutDto,AuthLoginOutSchema} from '../contracts/models/authLogin/authLogin.out.dto.js';
-import {ExecuteAuthLoginOptions} from '../contracts/options/authLogin.options.js';
-import {PostBurmProfileIdentifierPort} from '../contracts/options/ports/burm.ports.js';
-import { AuthLoginError } from '../errors/authLogin.error.js';
+// dtos
+import {AuthLoginInDto} from '../dto/authLogin.in.dto.js';
+import {AuthLoginOutDto} from '../dto/authLogin.out.dto.js';
+// contracts
+import {AuthLoginContract, PostBurmProfileIdentifierPort} from '../contract/authLogin.contract.js';
+// errors
 import { AuthLoginErrorService } from '../errors/authLogin.errors.js';
 
 export class AuthLoginService {
     private profIdentifier : PostBurmProfileIdentifierPort;
 
-    constructor(options : ExecuteAuthLoginOptions) {
+    constructor(options : AuthLoginContract) {
         this.profIdentifier = options.ports.postBurmProfileIdentifierPort;
     }
 

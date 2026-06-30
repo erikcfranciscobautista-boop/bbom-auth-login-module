@@ -1,10 +1,4 @@
-export { executeAuthLoginModule } from './main.js';
-export { authLoginMiddleware } from './middleware/authLogin.middleware.js';
-export { AuthLoginInSchema } from './contracts/models/authLogin/authLogin.in.dto.js';
-export type { AuthLoginInDto } from './contracts/models/authLogin/authLogin.in.dto.js';
-export type { AuthLoginOutDto } from './contracts/models/authLogin/authLogin.out.dto.js';
-export type { ExecuteAuthLoginOptions } from './contracts/options/authLogin.options.js';
-export { PostBurmProfileIdentifierPort } from './contracts/options/ports/burm.ports.js';
-export { BurmProfileIdentifierDto } from './contracts/models/burm/profileIdentifier.dto.js';
-export { BurmProfileIdentifierSchema } from './contracts/models/burm/profileIdentifier.dto.js';
-export { SwaggerAuthLoginInSchema } from './contracts/swagger/authLogin.swagger.js';
+export { authLogin } from './authLogin.js';
+
+export { AuthLoginInSchema } from './dto/authLogin.in.dto.js';
+export { AuthLoginSwagger } from './swagger/authLogin.swagger.js';
