@@ -15,7 +15,11 @@ export class AuthLoginService {
 
     async executeAuthLoginService(request : AuthLoginInDto) : Promise<AuthLoginOutDto> {
         try{
-            const profileIdentifier = await this.profIdentifier(request.username);
+            const profileIdentifier = await this.profIdentifier(request.username).then(
+                res => res
+            ).catch(
+                error => { throw AuthLoginErrorService }
+            );
             return {
                 token: profileIdentifier.burmUserId
             }
