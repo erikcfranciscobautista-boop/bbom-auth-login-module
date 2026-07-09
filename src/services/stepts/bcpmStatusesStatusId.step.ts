@@ -21,5 +21,10 @@ export async function jstepBcpmStatusesStatusId(options: JStepBcpmStatusesStatus
         throw AuthLoginErrorService;
     }
 
+    if (status.bcpmStatusKey !== 'ACTIVE') {
+        logger.error?.(`error - [bcpmStatusesStatusId] : invalid status key ${status.bcpmStatusKey}`);
+        throw AuthLoginErrorService;
+    }
+
     return status;
 }

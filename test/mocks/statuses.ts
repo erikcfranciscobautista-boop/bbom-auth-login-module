@@ -15,4 +15,17 @@ const mockGetBcpmStatusesStatusIdKoPort = async (statusId: string) => {
     return {};
 };
 
-export { mockGetBcpmStatusesStatusIdOKPort, mockGetBcpmStatusesStatusIdKoPort };
+const mockGetBcpmStatusesStatusIdInactivePort = async (statusId: string) => {
+    fastify.log.info(`[Mock BCPM Status] Buscando status para: ${statusId}`);
+    return {
+        bcpmStatusId: statusId,
+        bcpmStatusKey: 'BLOCKED',
+        bcpmStatusName: 'Blocked'
+    };
+};
+
+export {
+    mockGetBcpmStatusesStatusIdOKPort,
+    mockGetBcpmStatusesStatusIdKoPort,
+    mockGetBcpmStatusesStatusIdInactivePort
+};
