@@ -2,21 +2,10 @@ import Fastify from 'fastify';
 import { authLogin } from '../src/index.js'; // Ajusta la ruta a tu entrypoint
 import { AuthLoginContract } from '../src/index.js';
 import { AuthLoginErrorService } from '../src/index.js';
+import { mockPostBurmProfileIdentifierOKPort, mockPostBurmProfileIdentifierKoPort, mockPostBurmProfileIdentifierKo2Port } from './mocks/profileidentifier.js';
 
 const fastify = Fastify({ logger: true });
 
-// 1. Mantenemos el Mock del puerto/infraestructura para BURM
-const mockPostBurmProfileIdentifierPort = async (username: string) => {
-    fastify.log.info(`[Mock BURM IdP] Buscando identificador para: ${username}`);
-    return {
-        burmUserId: `usr_mock_bcm_2026_${Math.random().toString(36).slice(2, 7)}`,
-        bcpmStatusId: 'ACTIVE',
-        bcpmDepartmentId: 'dept_mock_001',
-        bcpmRoleId: 'role_mock_001'
-    };
-};
-
-// 2. Creamos un endpoint POST para recibir tus peticiones manuales
 fastify.post('/auth/login', async (request, reply) => {
     try {
         const body = request.body as any;
@@ -28,8 +17,7 @@ fastify.post('/auth/login', async (request, reply) => {
                 username: body.username // Aquí mapeas lo que envíes en tu JSON
             },
             ports: {
-                //postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierPort
-                postBurmProfileIdentifierPort: null
+                postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierKo2Port
             },
             logger: requestLogger
         };
