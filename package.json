@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "localhost": "node --loader ts-node/esm test/scripts/run-local.ts",
+    "localhost": "node --loader ts-node/esm test/run-local.ts",
     "prepare": "npm run build"
   },
   "dependencies": {
