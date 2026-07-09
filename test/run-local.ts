@@ -17,7 +17,7 @@ fastify.post('/auth/login', async (request, reply) => {
                 username: body.username // Aquí mapeas lo que envíes en tu JSON
             },
             ports: {
-                postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierKo2Port
+                postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierOKPort
             },
             logger: requestLogger
         };

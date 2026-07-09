@@ -17,20 +17,31 @@ export class AuthLoginService {
 
     async executeAuthLoginService(request : AuthLoginInDto) : Promise<AuthLoginOutDto> {
         try{
-            this.logger.info('step : executeAuthLoginService - START');
-            this.logger.info('step : profIdentifier');
+            this.logger.info('-----------------------------------------------------');
+            this.logger.info(`start - executeAuthLoginService `);
+            this.logger.info('-----------------------------------------------------');
+
+            this.logger.info('step : profileIdentifier');
             const profileIdentifier = await this.profIdentifier(request.username)
             .then( res =>  res )
             .catch( e => { 
-                this.logger.error(`Error [profileIdentifier] : ${e}`);
+                this.logger.error(`error - [profileIdentifier] : ${e}`);
                 throw AuthLoginErrorService; 
             });
-            this.logger.info(`OK [executeAuthLoginService] END`);
+
+            const response = profileIdentifier.burmUserId
+
+            this.logger.info('-----------------------------------------------------');
+            this.logger.info(`end - OK - executeAuthLoginService `);
+            this.logger.info('-----------------------------------------------------');
             return {
-                token: profileIdentifier.burmUserId
+                token: response
             }
         } catch (error) {
-            this.logger.info(`OK [executeAuthLoginService] END`);
+            this.logger.error(error);
+            this.logger.info('-----------------------------------------------------');
+            this.logger.info(`end - ERROR - executeAuthLoginService `);
+            this.logger.info('-----------------------------------------------------');
             throw AuthLoginErrorService;
         }
     }
