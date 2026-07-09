@@ -3,6 +3,7 @@ import { authLogin } from '../src/index.js'; // Ajusta la ruta a tu entrypoint
 import { AuthLoginContract } from '../src/index.js';
 import { AuthLoginErrorService } from '../src/index.js';
 import { mockPostBurmProfileIdentifierOKPort, mockPostBurmProfileIdentifierKoPort, mockPostBurmProfileIdentifierKo2Port } from './mocks/profileidentifier.js';
+import { mockGetBcpmStatusesStatusIdOKPort } from './mocks/statuses.js';
 
 const fastify = Fastify({ logger: true });
 
@@ -14,10 +15,12 @@ fastify.post('/auth/login', async (request, reply) => {
         // Construimos el contrato dinámicamente con el .req que tú mandes en el body
         const mockContract: AuthLoginContract = {
             req: {
-                username: body.username // Aquí mapeas lo que envíes en tu JSON
+                username: body.username,
+                password: body.password
             },
             ports: {
-                postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierOKPort
+                postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierOKPort,
+                getBcpmStatusesStatusIdPort: mockGetBcpmStatusesStatusIdOKPort
             },
             logger: requestLogger
         };
