@@ -3,6 +3,7 @@ import { authLogin } from '../src/index.js'; // Ajusta la ruta a tu entrypoint
 import { AuthLoginContract } from '../src/index.js';
 import { AuthLoginErrorService } from '../src/index.js';
 import { mockPostBurmProfileIdentifierOKPort, mockPostBurmProfileIdentifierKoPort, mockPostBurmProfileIdentifierKo2Port } from './mocks/profileidentifier.js';
+import { mockGetBcpmPermissionsRoleIdOKPort } from './mocks/permissions.js';
 import { mockGetBcpmStatusesStatusIdOKPort } from './mocks/statuses.js';
 
 const fastify = Fastify({ logger: true });
@@ -20,7 +21,8 @@ fastify.post('/auth/login', async (request, reply) => {
             },
             ports: {
                 postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierOKPort,
-                getBcpmStatusesStatusIdPort: mockGetBcpmStatusesStatusIdOKPort
+                getBcpmStatusesStatusIdPort: mockGetBcpmStatusesStatusIdOKPort,
+                getBcpmPermissionsRoleIdPort: mockGetBcpmPermissionsRoleIdOKPort
             },
             logger: requestLogger
         };
