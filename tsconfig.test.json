@@ -3,5 +3,9 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "include": ["src/**/*", "test/**/*"]
+  "include": [
+    "src/**/*", 
+    "test/**/*",
+    "scripts/**/*"  // <-- Añadido por si tus mocks de prueba usan scripts locales
+  ]
 }
