@@ -18,19 +18,13 @@ export class AuthLoginService {
     async executeAuthLoginService(request : AuthLoginInDto) : Promise<AuthLoginOutDto> {
         try{
             this.logger.info('step : executeAuthLoginService - START');
-            const profileIdentifier = await this.profIdentifier(request.username).then(
-
-            
-                res => {
-                    this.logger.info(`OK [profileIdentifier] Identifier obtained successfully for user: ${request.username}`);
-                    return res;
-                }
-            ).catch(
-                error => { 
-                    this.logger.info(`KO [profileIdentifier] Error while obtaining profile identifier`,error);
-                    throw AuthLoginErrorService 
-                }
-            );
+            this.logger.info('step : profIdentifier');
+            const profileIdentifier = await this.profIdentifier(request.username)
+            .then( res =>  res )
+            .catch( e => { 
+                this.logger.error(`Error [profileIdentifier] : ${e}`);
+                throw AuthLoginErrorService; 
+            });
             this.logger.info(`OK [executeAuthLoginService] END`);
             return {
                 token: profileIdentifier.burmUserId
