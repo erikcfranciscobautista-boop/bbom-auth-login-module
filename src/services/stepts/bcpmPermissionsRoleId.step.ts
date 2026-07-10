@@ -4,6 +4,12 @@ import {
 } from '../../contract/authLogin.contract.js';
 import { AuthLoginErrorService } from '../../errors/authLogin.errors.js';
 
+export interface PermissionItem {
+    resource: string;
+    action: string;
+    scope: string;
+}
+
 interface JStepBcpmPermissionsRoleIdOptions {
     bcpmRoleId: string;
     getBcpmPermissionsRoleId: GetBcpmPermissionsRoleIdPort;
@@ -21,12 +27,20 @@ export async function jstepBcpmPermissionsRoleId(options: JStepBcpmPermissionsRo
         throw AuthLoginErrorService;
     }
 
+    const normalizedPermissions: PermissionItem[] = [];
+
     for (const permission of permissions) {
         if (!permission.resource || !permission.action || !permission.scope) {
             logger.error?.('error - [bcpmPermissionsRoleId] : incomplete permission item');
             throw AuthLoginErrorService;
         }
+
+        normalizedPermissions.push({
+            resource: permission.resource,
+            action: permission.action,
+            scope: permission.scope
+        });
     }
 
-    return permissions;
+    return normalizedPermissions;
 }

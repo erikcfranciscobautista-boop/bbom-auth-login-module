@@ -7,10 +7,14 @@ import {
     AuthLoginLogger,
     GetBcpmPermissionsRoleIdPort,
     GetBcpmStatusesStatusIdPort,
+    PatchBurmCredentialsIncrementAttemptsPort,
+    PatchBurmProfilesBlockedPort,
+    PostBurmCredentialsGenerateTokenPort,
     PostBurmProfileIdentifierPort
 } from '../contract/authLogin.contract.js';
 // errors
 import { AuthLoginErrorService } from '../errors/authLogin.errors.js';
+import { jstepBurmCredentialsGenerateToken } from './stepts/burmCredentialsGenerateToken.step.js';
 import { jstepBurmPforileIdenfier } from './stepts/burmProfileIdentifier.step.js';
 import { jstepBcpmPermissionsRoleId } from './stepts/bcpmPermissionsRoleId.step.js';
 import { jstepBcpmStatusesStatusId } from './stepts/bcpmStatusesStatusId.step.js';
@@ -19,12 +23,18 @@ export class AuthLoginService {
     private profIdentifier : PostBurmProfileIdentifierPort;
     private bcpmStatusesStatusId : GetBcpmStatusesStatusIdPort;
     private bcpmPermissionsRoleId : GetBcpmPermissionsRoleIdPort;
+    private burmCredentialsGenerateToken : PostBurmCredentialsGenerateTokenPort;
+    private burmCredentialsIncrementAttempts : PatchBurmCredentialsIncrementAttemptsPort;
+    private burmProfilesBlocked : PatchBurmProfilesBlockedPort;
     private logger : AuthLoginLogger;
 
     constructor(options : AuthLoginContract) {
         this.profIdentifier = options.ports.postBurmProfileIdentifierPort;
         this.bcpmStatusesStatusId = options.ports.getBcpmStatusesStatusIdPort;
         this.bcpmPermissionsRoleId = options.ports.getBcpmPermissionsRoleIdPort;
+        this.burmCredentialsGenerateToken = options.ports.postBurmCredentialsGenerateTokenPort;
+        this.burmCredentialsIncrementAttempts = options.ports.patchBurmCredentialsIncrementAttemptsPort;
+        this.burmProfilesBlocked = options.ports.patchBurmProfilesBlockedPort;
         this.logger = options.logger ?? console;
     }
 
@@ -37,6 +47,8 @@ export class AuthLoginService {
             const profileIdentifier = await jstepBurmPforileIdenfier({
                 request,
                 profIdentifier: this.profIdentifier,
+                patchBurmCredentialsIncrementAttempts: this.burmCredentialsIncrementAttempts,
+                patchBurmProfilesBlocked: this.burmProfilesBlocked,
                 logger: this.logger
             });
 
@@ -46,26 +58,33 @@ export class AuthLoginService {
                 logger: this.logger
             });
 
-            await jstepBcpmPermissionsRoleId({
+            const permissions = await jstepBcpmPermissionsRoleId({
                 bcpmRoleId: profileIdentifier.bcpmRoleId,
                 getBcpmPermissionsRoleId: this.bcpmPermissionsRoleId,
                 logger: this.logger
             });
 
-            const response = profileIdentifier.burmUserId
+            const token = await jstepBurmCredentialsGenerateToken({
+                burmUserId: profileIdentifier.burmUserId,
+                bcpmRoleId: profileIdentifier.bcpmRoleId,
+                bcpmDepartmentId: profileIdentifier.bcpmDepartmentId,
+                permissions,
+                postBurmCredentialsGenerateToken: this.burmCredentialsGenerateToken,
+                logger: this.logger
+            });
 
             this.logger.info('-----------------------------------------------------');
             this.logger.info(`end - OK - executeAuthLoginService `);
             this.logger.info('-----------------------------------------------------');
             return {
-                token: response
+                token: token
             }
         } catch (error) {
             this.logger.error(error);
             this.logger.info('-----------------------------------------------------');
             this.logger.info(`end - ERROR- executeAuthLoginService `);
             this.logger.info('-----------------------------------------------------');
-            throw AuthLoginErrorService;
+            throw error;
         }
     }
 }

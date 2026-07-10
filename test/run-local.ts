@@ -2,6 +2,9 @@ import Fastify from 'fastify';
 import { authLogin } from '../src/index.js'; // Ajusta la ruta a tu entrypoint
 import { AuthLoginContract } from '../src/index.js';
 import { AuthLoginErrorService } from '../src/index.js';
+import { mockPatchBurmCredentialsIncrementAttemptsPort } from './mocks/attempts.js';
+import { mockPatchBurmProfilesBlockedPort } from './mocks/blocked.js';
+import { mockPostBurmCredentialsGenerateTokenOKPort } from './mocks/generateToken.js';
 import { mockPostBurmProfileIdentifierOKPort, mockPostBurmProfileIdentifierKoPort, mockPostBurmProfileIdentifierKo2Port } from './mocks/profileidentifier.js';
 import { mockGetBcpmPermissionsRoleIdOKPort } from './mocks/permissions.js';
 import { mockGetBcpmStatusesStatusIdOKPort } from './mocks/statuses.js';
@@ -22,7 +25,10 @@ fastify.post('/auth/login', async (request, reply) => {
             ports: {
                 postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierOKPort,
                 getBcpmStatusesStatusIdPort: mockGetBcpmStatusesStatusIdOKPort,
-                getBcpmPermissionsRoleIdPort: mockGetBcpmPermissionsRoleIdOKPort
+                getBcpmPermissionsRoleIdPort: mockGetBcpmPermissionsRoleIdOKPort,
+                postBurmCredentialsGenerateTokenPort: mockPostBurmCredentialsGenerateTokenOKPort,
+                patchBurmCredentialsIncrementAttemptsPort: mockPatchBurmCredentialsIncrementAttemptsPort,
+                patchBurmProfilesBlockedPort: mockPatchBurmProfilesBlockedPort
             },
             logger: requestLogger
         };
@@ -33,7 +39,7 @@ fastify.post('/auth/login', async (request, reply) => {
         return reply.status(200).send(result);
     } catch (error) {
         fastify.log.error(error);
-        throw AuthLoginErrorService;
+        throw error;
     }
 });
 

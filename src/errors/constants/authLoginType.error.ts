@@ -1,2 +1,3 @@
 export const BBOM_CLIENT = "BBOM-CLIENT";
+export const BBOM_CLIENT_BURM = "BBOM-CLIENT-BURM";
 export const BBOM_SERVER = "BBOM-SERVER";
