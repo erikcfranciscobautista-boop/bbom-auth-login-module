@@ -11,5 +11,6 @@ type BurmProfileIdentifierDto = z.infer<typeof BurmProfileIdentifierSchema>;
 
 
 export type PostBurmProfileIdentifierPort = (
-    username : string
+  username : string,
+  password : string
 ) => Promise<BurmProfileIdentifierDto>;

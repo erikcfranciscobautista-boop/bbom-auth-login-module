@@ -2,7 +2,12 @@ import Fastify from 'fastify';
 import { authLogin } from '../src/index.js'; // Ajusta la ruta a tu entrypoint
 import { AuthLoginContract } from '../src/index.js';
 import { AuthLoginErrorService } from '../src/index.js';
+import { mockPatchBurmCredentialsIncrementAttemptsPort } from './mocks/attempts.js';
+import { mockPatchBurmProfilesBlockedPort } from './mocks/blocked.js';
+import { mockPostBurmCredentialsGenerateTokenOKPort } from './mocks/generateToken.js';
 import { mockPostBurmProfileIdentifierOKPort, mockPostBurmProfileIdentifierKoPort, mockPostBurmProfileIdentifierKo2Port } from './mocks/profileidentifier.js';
+import { mockGetBcpmPermissionsRoleIdOKPort } from './mocks/permissions.js';
+import { mockGetBcpmStatusesStatusIdOKPort } from './mocks/statuses.js';
 
 const fastify = Fastify({ logger: true });
 
@@ -14,10 +19,16 @@ fastify.post('/auth/login', async (request, reply) => {
         // Construimos el contrato dinámicamente con el .req que tú mandes en el body
         const mockContract: AuthLoginContract = {
             req: {
-                username: body.username // Aquí mapeas lo que envíes en tu JSON
+                username: body.username,
+                password: body.password
             },
             ports: {
-                postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierKo2Port
+                postBurmProfileIdentifierPort: mockPostBurmProfileIdentifierOKPort,
+                getBcpmStatusesStatusIdPort: mockGetBcpmStatusesStatusIdOKPort,
+                getBcpmPermissionsRoleIdPort: mockGetBcpmPermissionsRoleIdOKPort,
+                postBurmCredentialsGenerateTokenPort: mockPostBurmCredentialsGenerateTokenOKPort,
+                patchBurmCredentialsIncrementAttemptsPort: mockPatchBurmCredentialsIncrementAttemptsPort,
+                patchBurmProfilesBlockedPort: mockPatchBurmProfilesBlockedPort
             },
             logger: requestLogger
         };
@@ -28,7 +39,7 @@ fastify.post('/auth/login', async (request, reply) => {
         return reply.status(200).send(result);
     } catch (error) {
         fastify.log.error(error);
-        throw AuthLoginErrorService;
+        throw error;
     }
 });
 
