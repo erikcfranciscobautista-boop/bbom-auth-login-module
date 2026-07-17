@@ -105,7 +105,7 @@ Todos los errores deben salir en este formato:
   "statusType": "BBOM-LOGIN-VALIDATIONS-FORMAT",
   "details": {
     "message": "Required fields",
-    "misssingFields": ["username", "password"]
+    "missingFields": ["username", "password"]
   }
 }
 ```

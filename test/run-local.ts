@@ -16,7 +16,7 @@ function buildValidationErrorPayload() {
         statusType: AuthLoginErrorRequest.statusType,
         details: {
             message: AuthLoginErrorRequest.details.message,
-            misssingFields: AuthLoginErrorRequest.details.missingFields ?? []
+            missingFields: AuthLoginErrorRequest.details.missingFields ?? []
         }
     };
 }
@@ -37,7 +37,7 @@ fastify.setErrorHandler((error, _request, reply) => {
             statusType: maybeAuthError.statusType,
             details: {
                 message: maybeAuthError.details?.message ?? 'An error has occurred, try again.',
-                misssingFields: maybeAuthError.details?.missingFields
+                missingFields: maybeAuthError.details?.missingFields
             }
         };
 
