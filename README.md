@@ -1,233 +1,178 @@
-//"prepare": "node -e \"if(require('fs').existsSync('tsconfig.build.json')) require('child_process').execSync('npm run build', {stdio: 'inherit'})\""
-
 # bbom-auth-login-module
 
-Módulo de orquestación de login para BBOM (Business Business Orchestration Module). Coordina la validación de identidad con BURM, verifica estados administrativos con BCPM y genera JWT enriquecidos con permisos.
+Modulo de orquestacion de login BBOM.
 
-## Arquitectura
+Esta guia esta alineada con la implementacion actual en [test/run-local.ts](test/run-local.ts) y con el flujo vigente del modulo.
 
-El módulo implementa una orquestación de 5 pasos:
+## Flujo Actual
 
-1. **POST /login** (entry point) — valida payload
-2. **POST BURM /profiles/identifier** — valida credenciales y recupera perfil
-3. **GET BCPM /status/{statusId}** — verifica estado administrativo
-4. **GET BCPM /permissions/{roleId}** — extrae facultades granulares
-5. **POST BURM /credentials/generateToken** — genera JWT enriquecido
+Entrada del front:
 
-### Manejo de errores
-
-Si falla el paso 2 (validación BURM):
-- Incrementar intentos fallidos
-- Si intentos >= 5, bloquear perfil
-- Retornar error genérico (401 con mensaje "Credenciales inválidas")
-
-Si falla paso 3 (status), cualquier statusKey ≠ "ACTIVE" → error 401 genérico.
-
-Cualquier otro error → error 401 genérico.
-
-## Tipos y Contratos
-
-El módulo define estos tipos:
-
-### Request/Response
-
-```typescript
-// Input
-type LoginInput = { username: string; password: string };
-
-// Output
-type LoginOutput = {
-  token: string;
-};
+```json
+{
+  "username": "string",
+  "password": "string"
+}
 ```
 
-### Adapters (Puertos)
+Orquestacion interna:
 
-```typescript
-type LoginAdapters = {
-  postBurmProfilesIdentifier(username, password): BurmProfileResponse;
-  getBcpmStatusesStatusId(statusId): BcpmStatusResponse;
-  getBcpmPermissionsRoleId(roleId): BcpmPermissionsResponse;
-  postBurmCredentialsGenerateToken(userId, roleId, deptId, permissions): BurmTokenResponse;
-  patchBurmCredentialsIncrementAttempts(userId): { statusId, attempts };
-  patchBurmProfilesBlocked(userId): void;
-};
+1. `getSystemTokenPort`
+2. `getBurmUserProfileIdentifiersUniquePort`
+3. `postBurmCredentialValidationsPort`
+4. `getBcpmStatusesOnePort`
+5. `getBcpmRolePermissionsListPort`
+6. `postBurmCredentialTokensPort`
+
+Respuesta OK:
+
+```json
+{
+  "token": "string"
+}
 ```
 
-Donde:
-- `BurmProfileResponse`: `{ burmProfileId, burmUserId, burmStatusId, burmDepartmentId, burmRoleId }`
-- `BcpmStatusResponse`: `{ bcpmStatusId, bcpmStatusKey, bcpmStatusName }`
-- `BcpmPermissionsResponse`: `Array<{ resource, action, scope }>`
-- `BurmTokenResponse`: `{ burmToken }`
+## Contrato De Implementacion
 
-## Integración en Orquestador
+Referencia de contrato: [src/contract/authLogin.contract.ts](src/contract/authLogin.contract.ts)
 
-### 1) Instalar como dependencia
+Debes implementar estos puertos:
 
-Desde registry (si está publicado):
+1. `getBurmUserProfileIdentifiersUniquePort(params, systemToken)`
+2. `postBurmCredentialValidationsPort(burmUserId, burmCredentialPassword, systemToken)`
+3. `getBcpmStatusesOnePort(bcpmStatusId, systemToken)`
+4. `getBcpmRolePermissionsListPort(bcpmRoleId, systemToken)`
+5. `postBurmCredentialTokensPort(payload, systemToken)`
+6. `getSystemTokenPort()`
 
-```bash
-npm install @uuaa/bbom-auth-login-module
-```
+El modulo recibe `username` y decide internamente si buscar por `email`, `phone` o `nickname` para `unique`.
 
-Desde GitHub:
+## Ejemplo De Integracion
 
-```bash
-npm install github:BAUHEZ_COMPANY/UUAAS/BBOM-MODULES/bbom-auth-login-module
-```
+```ts
+import { authLogin, type AuthLoginContract } from "@uuaas-bbom/bbom-auth-login-module";
 
-Con tag/branch específico:
-
-```bash
-npm install github:BAUHEZ_COMPANY/UUAAS/BBOM-MODULES/bbom-auth-login-module#v0.1.2
-```
-
-### 2) Integración recomendada (simple)
-
-Solo implementa los 6 adaptadores y pásalos en el registro del plugin. El módulo construye internamente el use case.
-
-```typescript
-import { loginRoutes, type LoginAdapters } from "@uuaa/bbom-auth-login-module";
-
-const adapters: LoginAdapters = {
-  postBurmProfilesIdentifier: (username, password) =>
-    burmClient.validateCredentials(username, password),
-  getBcpmStatusesStatusId: (statusId) => bcpmClient.getStatus(statusId),
-  getBcpmPermissionsRoleId: (roleId) => bcpmClient.getPermissions(roleId),
-  postBurmCredentialsGenerateToken: (userId, roleId, departmentId, permissions) =>
-    burmClient.generateToken(userId, roleId, departmentId, permissions),
-  patchBurmCredentialsIncrementAttempts: (userId) =>
-    burmClient.incrementAttempts(userId),
-  patchBurmProfilesBlocked: (userId) => burmClient.blockProfile(userId),
-};
-
-await app.register(loginRoutes, {
-  adapters,
-  routePath: "/login", // opcional (default)
-});
-```
-
-### 3) Integración legacy (compatible)
-
-También funciona por decorador si tu orquestador ya usa ese patrón:
-
-```typescript
-app.decorate("loginAdapters", {
-  ...adapters,
-  loginUseCase: (input) => buildLoginUseCase()(input, adapters),
-});
-
-await app.register(loginRoutes);
-```
-
-### 4) Logger opcional
-
-Si no pasas logger, el módulo usa `app.log` de Fastify automáticamente.
-
-```typescript
-await app.register(loginRoutes, {
-  adapters,
-  logger: {
-    info: (entry) => app.log.info({ context: entry.context }, entry.message),
-    warn: (entry) => app.log.warn({ context: entry.context }, entry.message),
-    error: (entry) => app.log.error({ context: entry.context }, entry.message),
+const contract: AuthLoginContract = {
+  req: {
+    username: "demo@mail.com",
+    password: "secret"
   },
-});
+  ports: {
+    getBurmUserProfileIdentifiersUniquePort: async (params, systemToken) => {
+      return burmClient.getUserProfileIdentifiersUnique(params, systemToken);
+    },
+    postBurmCredentialValidationsPort: async (burmUserId, burmCredentialPassword, systemToken) => {
+      return burmClient.postCredentialValidations({ burmUserId, burmCredentialPassword }, systemToken);
+    },
+    getBcpmStatusesOnePort: async (bcpmStatusId, systemToken) => {
+      return bcpmClient.getStatusesOne(bcpmStatusId, systemToken);
+    },
+    getBcpmRolePermissionsListPort: async (bcpmRoleId, systemToken) => {
+      return bcpmClient.getRolePermissionsList(bcpmRoleId, systemToken);
+    },
+    postBurmCredentialTokensPort: async (payload, systemToken) => {
+      return burmClient.postCredentialTokens(payload, systemToken);
+    },
+    getSystemTokenPort: async () => {
+      return tokenService.getSystemToken();
+    }
+  }
+};
+
+const result = await authLogin(contract);
+console.log(result.token);
 ```
 
-## Testing Local
+## Matriz De Errores (Vigente)
 
-Requisitos:
+Todos los errores deben salir en este formato:
+
+```json
+{
+  "statusCode": 0,
+  "statusType": "STRING",
+  "details": {
+    "message": "STRING"
+  }
+}
+```
+
+### BBOM 400
+
+```json
+{
+  "statusCode": 400,
+  "statusType": "BBOM-LOGIN-VALIDATIONS-FORMAT",
+  "details": {
+    "message": "Required fields",
+    "missingFields": ["username", "password"]
+  }
+}
+```
+
+### BBOM 500
+
+```json
+{
+  "statusCode": 500,
+  "statusType": "BBOM-LOGIN-INTERNAL-SERVER-ERROR",
+  "details": {
+    "message": "An error has occurred, try again."
+  }
+}
+```
+
+### Unauthorized (BURM y BCPM)
+
+Casos que mapean a 401:
+
+1. BURM `getBurmUserProfileIdentifiersUnique` -> 404
+2. BURM `postBurmCredentialValidations` -> 400 o 403
+3. BCPM `getBcpmStatusesOne` -> 404
+4. BCPM `getBcpmRolePermissionsList` -> 404
+
+Respuesta:
+
+```json
+{
+  "statusCode": 401,
+  "statusType": "BBOM-LOGIN-UNAUTHORIZED",
+  "details": {
+    "message": "Invalid credentials."
+  }
+}
+```
+
+## Ejecucion Local (Playground)
+
+Instalar dependencias:
+
 ```bash
 npm install
 ```
 
-Ejecutar servidor de prueba (con adaptadores mock):
+Levantar servidor local:
+
 ```bash
-npm run start:test
+npm run localhost
 ```
 
-Test del endpoint:
+Endpoint local:
+
+`POST /auth/login`
+
+Ejemplo:
+
 ```bash
-curl -X POST http://localhost:3000/login \
+curl -X POST http://localhost:3000/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"username":"demo","password":"secret123"}'
+  -d '{"username":"localuser","password":"localpass"}'
 ```
 
-Respuesta esperada (200):
-```json
-{
-  "token": "eyJ..."
-}
-```
+## Docker
 
-Ejecutar unit tests:
+Levantar playground con docker compose:
+
 ```bash
-npm run test:unit
+docker compose up --build bbom-auth-login-module-localhost
 ```
-
-Docker (mock local y tests):
-```bash
-npm run docker:local
-npm run docker:test:unit
-```
-
-Test con credenciales inválidas (401):
-```bash
-curl -X POST http://localhost:3000/login \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"demo","password":"wrong"}'
-```
-
-Respuesta esperada (401):
-```json
-{
-  "errorCode": "BBOM-CLIENT",
-  "details": {
-    "message": "Credenciales inválidas"
-  }
-}
-```
-
-## Estructura
-
-```
-src/
-  index.ts                    # exports routes + types
-  contracts.ts                # LoginAdapters types
-  errors/
-    login.errors.ts           # InvalidCredentialsError, etc.
-  models/
-    dto/
-      input/
-        login.dto.ts          # LoginInputSchema (Zod)
-      output/
-        login.dto.ts          # LoginOutputSchema (Zod)
-  services/
-    login.ports.ts            # LoginUseCase type
-    login.dependencies.ts     # defaultLoginAdapters
-    login.implementation.ts   # buildLoginUseCase() with orchestration logic
-  controllers/
-    login.controller.ts       # buildLoginController
-  routes/
-    login.routes.ts           # Fastify plugin
-scripts/
-  run-local.ts                # Local test server
-```
-
-## Errores
-
-Todos los errores retornan 401 con formato genérico BBOM-CLIENT:
-
-```json
-{
-  "errorCode": "BBOM-CLIENT",
-  "details": {
-    "message": "Credenciales inválidas",
-    "traceId": "BURM-error-id-if-available"
-  }
-}
-```
-
-Excepto errores de validación (400) y errores internos (500).
-# bbom-auth-login-module

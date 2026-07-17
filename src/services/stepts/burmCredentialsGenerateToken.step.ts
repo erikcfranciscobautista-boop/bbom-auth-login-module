@@ -1,36 +1,45 @@
 import {
     AuthLoginLogger,
-    PostBurmCredentialsGenerateTokenPort
-} from '../../contract/authLogin.contract.js';
-import { AuthLoginErrorService } from '../../errors/authLogin.errors.js';
-import { PermissionItem } from './bcpmPermissionsRoleId.step.js';
+    PostBurmCredentialTokensPort
+} from '../../contract/index.contract.js';
+import { AuthLoginErrorService } from '../../errors/index.errors.js';
+import type { PermissionItem } from './index.steps.js';
 
 interface JStepBurmCredentialsGenerateTokenOptions {
     burmUserId: string;
+    bcpmStatusId: string;
     bcpmRoleId: string;
     bcpmDepartmentId: string;
     permissions: PermissionItem[];
-    postBurmCredentialsGenerateToken: PostBurmCredentialsGenerateTokenPort;
+    postBurmCredentialTokens: PostBurmCredentialTokensPort;
+    systemToken: string;
     logger: AuthLoginLogger;
 }
 
 export async function jstepBurmCredentialsGenerateToken(options: JStepBurmCredentialsGenerateTokenOptions) {
     const {
         burmUserId,
+        bcpmStatusId,
         bcpmRoleId,
         bcpmDepartmentId,
         permissions,
-        postBurmCredentialsGenerateToken,
+        postBurmCredentialTokens,
+        systemToken,
         logger
     } = options;
 
     logger.info?.('step : burmCredentialsGenerateToken');
-    const tokenResponse = await postBurmCredentialsGenerateToken(
-        burmUserId,
-        bcpmRoleId,
-        bcpmDepartmentId,
-        permissions
-    );
+    const tokenResponse = await postBurmCredentialTokens({
+        burmUser: {
+            burmUserId
+        },
+        burmProfile: {
+            bcpmStatusId,
+            bcpmDepartmentId,
+            bcpmRoleId
+        },
+        bcpmPermissions: permissions
+    }, systemToken);
 
     if (!tokenResponse || !tokenResponse.token) {
         logger.error?.('error - [burmCredentialsGenerateToken] : incomplete response');

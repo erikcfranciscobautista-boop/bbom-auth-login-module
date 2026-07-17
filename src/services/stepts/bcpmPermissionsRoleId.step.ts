@@ -1,26 +1,40 @@
 import {
     AuthLoginLogger,
-    GetBcpmPermissionsRoleIdPort
-} from '../../contract/authLogin.contract.js';
-import { AuthLoginErrorService } from '../../errors/authLogin.errors.js';
+    GetBcpmRolePermissionsListPort
+} from '../../contract/index.contract.js';
+import { AuthLoginErrorService, AuthLoginErrorValidationBcpm } from '../../errors/index.errors.js';
+import { getStatusCode } from '../utils/index.utils.js';
 
 export interface PermissionItem {
-    resource: string;
-    action: string;
-    scope: string;
+    bcpmPermissionResource: string;
+    bcpmPermissionAction: string;
+    bcpmPermissionScope: string;
 }
 
 interface JStepBcpmPermissionsRoleIdOptions {
     bcpmRoleId: string;
-    getBcpmPermissionsRoleId: GetBcpmPermissionsRoleIdPort;
+    getBcpmRolePermissionsList: GetBcpmRolePermissionsListPort;
+    systemToken: string;
     logger: AuthLoginLogger;
 }
 
 export async function jstepBcpmPermissionsRoleId(options: JStepBcpmPermissionsRoleIdOptions) {
-    const { bcpmRoleId, getBcpmPermissionsRoleId, logger } = options;
+    const { bcpmRoleId, getBcpmRolePermissionsList, systemToken, logger } = options;
 
     logger.info?.('step : bcpmPermissionsRoleId');
-    const permissions = await getBcpmPermissionsRoleId(bcpmRoleId);
+    let permissions;
+    try {
+        permissions = await getBcpmRolePermissionsList(bcpmRoleId, systemToken);
+    } catch (error) {
+        const statusCode = getStatusCode(error);
+        if (statusCode === 404) {
+            logger.warn?.('warn - [bcpmPermissionsRoleId] : resource not found');
+            throw AuthLoginErrorValidationBcpm;
+        }
+
+        logger.error?.('error - [bcpmPermissionsRoleId] : unexpected error', error);
+        throw AuthLoginErrorService;
+    }
 
     if (!permissions || !Array.isArray(permissions)) {
         logger.error?.('error - [bcpmPermissionsRoleId] : invalid response');
@@ -30,16 +44,29 @@ export async function jstepBcpmPermissionsRoleId(options: JStepBcpmPermissionsRo
     const normalizedPermissions: PermissionItem[] = [];
 
     for (const permission of permissions) {
-        if (!permission.resource || !permission.action || !permission.scope) {
+        if (
+            !permission.bcpmPermissionResource ||
+            !permission.bcpmPermissionAction ||
+            !permission.bcpmPermissionScope
+        ) {
             logger.error?.('error - [bcpmPermissionsRoleId] : incomplete permission item');
             throw AuthLoginErrorService;
         }
 
+        if (!permission.bcpmPermissionIsActive || !permission.bcpmRolePermissionIsAllowed) {
+            continue;
+        }
+
         normalizedPermissions.push({
-            resource: permission.resource,
-            action: permission.action,
-            scope: permission.scope
+            bcpmPermissionResource: permission.bcpmPermissionResource,
+            bcpmPermissionAction: permission.bcpmPermissionAction,
+            bcpmPermissionScope: permission.bcpmPermissionScope
         });
+    }
+
+    if (normalizedPermissions.length === 0) {
+        logger.warn?.('warn - [bcpmPermissionsRoleId] : empty allowed permissions');
+        throw AuthLoginErrorValidationBcpm;
     }
 
     return normalizedPermissions;
