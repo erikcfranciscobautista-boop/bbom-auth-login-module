@@ -1,7 +1,10 @@
 import Fastify from 'fastify';
-import { authLogin } from '../src/index.js';
-import type { AuthLoginContract } from '../src/index.js';
-import { AuthLoginErrorRequest, AuthLoginErrorService } from '../src/errors/index.errors.js';
+import {
+    authLogin,
+    AuthLoginErrorRequest,
+    AuthLoginErrorService,
+    type AuthLoginContract
+} from '../src/index.js';
 import {
     mockGetBcpmRolePermissionsListOKPort,
     mockGetBcpmStatusesOneOKPort,
