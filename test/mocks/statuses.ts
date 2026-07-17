@@ -1,31 +1,36 @@
 import Fastify from 'fastify';
 const fastify = Fastify({ logger: true });
 
-const mockGetBcpmStatusesStatusIdOKPort = async (statusId: string) => {
+const mockGetBcpmStatusesOneOKPort = async (statusId: string, systemToken: string) => {
     fastify.log.info(`[Mock BCPM Status] Buscando status para: ${statusId}`);
+    fastify.log.debug(`[Mock BCPM Status] token length: ${systemToken.length}`);
     return {
         bcpmStatusId: statusId,
         bcpmStatusKey: 'ACTIVE',
-        bcpmStatusName: 'Active'
+        bcpmStatusName: 'Active',
+        bcpmStatusType: 'PROFILE'
     };
 };
 
-const mockGetBcpmStatusesStatusIdKoPort = async (statusId: string) => {
+const mockGetBcpmStatusesOneKoPort = async (statusId: string, systemToken: string) => {
     fastify.log.info(`[Mock BCPM Status] Buscando status para: ${statusId}`);
+    fastify.log.debug(`[Mock BCPM Status] token length: ${systemToken.length}`);
     return {};
 };
 
-const mockGetBcpmStatusesStatusIdInactivePort = async (statusId: string) => {
+const mockGetBcpmStatusesOneInactivePort = async (statusId: string, systemToken: string) => {
     fastify.log.info(`[Mock BCPM Status] Buscando status para: ${statusId}`);
+    fastify.log.debug(`[Mock BCPM Status] token length: ${systemToken.length}`);
     return {
         bcpmStatusId: statusId,
         bcpmStatusKey: 'BLOCKED',
-        bcpmStatusName: 'Blocked'
+        bcpmStatusName: 'Blocked',
+        bcpmStatusType: 'PROFILE'
     };
 };
 
 export {
-    mockGetBcpmStatusesStatusIdOKPort,
-    mockGetBcpmStatusesStatusIdKoPort,
-    mockGetBcpmStatusesStatusIdInactivePort
+    mockGetBcpmStatusesOneOKPort,
+    mockGetBcpmStatusesOneKoPort,
+    mockGetBcpmStatusesOneInactivePort
 };

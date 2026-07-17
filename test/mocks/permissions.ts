@@ -1,25 +1,33 @@
 import Fastify from 'fastify';
 const fastify = Fastify({ logger: true });
 
-const mockGetBcpmPermissionsRoleIdOKPort = async (roleId: string) => {
+const mockGetBcpmRolePermissionsListOKPort = async (roleId: string, systemToken: string) => {
     fastify.log.info(`[Mock BCPM Permissions] Buscando permisos para: ${roleId}`);
+    fastify.log.debug(`[Mock BCPM Permissions] token length: ${systemToken.length}`);
     return [
         {
-            resource: 'users',
-            action: 'read',
-            scope: 'self'
+            bcpmPermissionId: 'perm_1',
+            bcpmPermissionResource: 'users',
+            bcpmPermissionAction: 'read',
+            bcpmPermissionScope: 'self',
+            bcpmPermissionIsActive: true,
+            bcpmRolePermissionIsAllowed: true
         },
         {
-            resource: 'sessions',
-            action: 'create',
-            scope: 'all'
+            bcpmPermissionId: 'perm_2',
+            bcpmPermissionResource: 'sessions',
+            bcpmPermissionAction: 'create',
+            bcpmPermissionScope: 'all',
+            bcpmPermissionIsActive: true,
+            bcpmRolePermissionIsAllowed: true
         }
     ];
 };
 
-const mockGetBcpmPermissionsRoleIdKoPort = async (roleId: string) => {
+const mockGetBcpmRolePermissionsListKoPort = async (roleId: string, systemToken: string) => {
     fastify.log.info(`[Mock BCPM Permissions] Buscando permisos para: ${roleId}`);
+    fastify.log.debug(`[Mock BCPM Permissions] token length: ${systemToken.length}`);
     return [{}];
 };
 
-export { mockGetBcpmPermissionsRoleIdOKPort, mockGetBcpmPermissionsRoleIdKoPort };
+export { mockGetBcpmRolePermissionsListOKPort, mockGetBcpmRolePermissionsListKoPort };

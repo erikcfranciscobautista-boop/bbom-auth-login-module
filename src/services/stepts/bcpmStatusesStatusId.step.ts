@@ -1,29 +1,43 @@
 import {
     AuthLoginLogger,
-    GetBcpmStatusesStatusIdPort
+    GetBcpmStatusesOnePort
 } from '../../contract/authLogin.contract.js';
-import { AuthLoginErrorService } from '../../errors/authLogin.errors.js';
+import { AuthLoginErrorService, AuthLoginErrorValidationBcpm } from '../../errors/authLogin.errors.js';
+import { getStatusCode } from '../utils/getStatusCode.util.js';
 
 interface JStepBcpmStatusesStatusIdOptions {
     bcpmStatusId: string;
-    getBcpmStatusesStatusId: GetBcpmStatusesStatusIdPort;
+    getBcpmStatusesOne: GetBcpmStatusesOnePort;
+    systemToken: string;
     logger: AuthLoginLogger;
 }
 
 export async function jstepBcpmStatusesStatusId(options: JStepBcpmStatusesStatusIdOptions) {
-    const { bcpmStatusId, getBcpmStatusesStatusId, logger } = options;
+    const { bcpmStatusId, getBcpmStatusesOne, systemToken, logger } = options;
 
     logger.info?.('step : bcpmStatusesStatusId');
-    const status = await getBcpmStatusesStatusId(bcpmStatusId);
+    let status;
+    try {
+        status = await getBcpmStatusesOne(bcpmStatusId, systemToken);
+    } catch (error) {
+        const statusCode = getStatusCode(error);
+        if (statusCode === 404) {
+            logger.warn?.('warn - [bcpmStatusesStatusId] : resource not found');
+            throw AuthLoginErrorValidationBcpm;
+        }
 
-    if (!status || !status.bcpmStatusId || !status.bcpmStatusKey || !status.bcpmStatusName) {
+        logger.error?.('error - [bcpmStatusesStatusId] : unexpected error', error);
+        throw AuthLoginErrorService;
+    }
+
+    if (!status || !status.bcpmStatusId || !status.bcpmStatusKey || !status.bcpmStatusName || !status.bcpmStatusType) {
         logger.error?.('error - [bcpmStatusesStatusId] : incomplete response');
         throw AuthLoginErrorService;
     }
 
     if (status.bcpmStatusKey !== 'ACTIVE') {
-        logger.error?.(`error - [bcpmStatusesStatusId] : invalid status key ${status.bcpmStatusKey}`);
-        throw AuthLoginErrorService;
+        logger.warn?.(`warn - [bcpmStatusesStatusId] : invalid status key ${status.bcpmStatusKey}`);
+        throw AuthLoginErrorValidationBcpm;
     }
 
     return status;
