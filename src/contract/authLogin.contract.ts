@@ -1,8 +1,10 @@
-import { GetBurmUserProfileIdentifiersUniquePort } from "./ports/burmUserProfileIdentifiersUnique.port.js";
-import { PostBurmCredentialValidationsPort } from "./ports/burmCredentialValidations.port.js";
-import { GetBcpmStatusesOnePort } from "./ports/bcpmStatusesOne.port.js";
-import { GetBcpmRolePermissionsListPort } from "./ports/bcpmRolePermissionsList.port.js";
-import { PostBurmCredentialTokensPort } from "./ports/burmCredentialTokens.port.js";
+import {
+    GetBcpmRolePermissionsListPort,
+    GetBcpmStatusesOnePort,
+    GetBurmUserProfileIdentifiersUniquePort,
+    PostBurmCredentialTokensPort,
+    PostBurmCredentialValidationsPort
+} from "./ports/index.ports.js";
 
 export interface AuthLoginLogger {
     info?: (...args: unknown[]) => void;
@@ -24,8 +26,10 @@ export interface AuthLoginContract {
     logger?: AuthLoginLogger;
 }
 
-export {GetBurmUserProfileIdentifiersUniquePort} from "./ports/burmUserProfileIdentifiersUnique.port.js";
-export {PostBurmCredentialValidationsPort} from "./ports/burmCredentialValidations.port.js";
-export {GetBcpmStatusesOnePort} from "./ports/bcpmStatusesOne.port.js";
-export {GetBcpmRolePermissionsListPort} from "./ports/bcpmRolePermissionsList.port.js";
-export {PostBurmCredentialTokensPort} from "./ports/burmCredentialTokens.port.js";
+export type {
+    GetBurmUserProfileIdentifiersUniquePort,
+    PostBurmCredentialValidationsPort,
+    GetBcpmStatusesOnePort,
+    GetBcpmRolePermissionsListPort,
+    PostBurmCredentialTokensPort
+} from "./ports/index.ports.js";

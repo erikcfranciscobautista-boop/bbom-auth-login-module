@@ -1,6 +1,5 @@
 // dtos
-import {AuthLoginInDto} from '../dto/authLogin.in.dto.js';
-import {AuthLoginOutDto} from '../dto/authLogin.out.dto.js';
+import { type AuthLoginInDto, type AuthLoginOutDto } from '../dto/index.dto.js';
 // contracts
 import {
     AuthLoginContract,
@@ -10,13 +9,15 @@ import {
     GetBurmUserProfileIdentifiersUniquePort,
     PostBurmCredentialTokensPort,
     PostBurmCredentialValidationsPort
-} from '../contract/authLogin.contract.js';
+} from '../contract/index.contract.js';
 // errors
-import { jstepBurmCredentialsGenerateToken } from './stepts/burmCredentialsGenerateToken.step.js';
-import { jstepBurmUserProfileIdentifiersUnique } from './stepts/burmUserProfileIdentifiersUnique.step.js';
-import { jstepBurmCredentialValidations } from './stepts/burmCredentialValidations.step.js';
-import { jstepBcpmPermissionsRoleId } from './stepts/bcpmPermissionsRoleId.step.js';
-import { jstepBcpmStatusesStatusId } from './stepts/bcpmStatusesStatusId.step.js';
+import {
+    jstepBcpmPermissionsRoleId,
+    jstepBcpmStatusesStatusId,
+    jstepBurmCredentialValidations,
+    jstepBurmCredentialsGenerateToken,
+    jstepBurmUserProfileIdentifiersUnique
+} from './stepts/index.steps.js';
 
 export class AuthLoginService {
     private burmUserProfileIdentifiersUnique : GetBurmUserProfileIdentifiersUniquePort;

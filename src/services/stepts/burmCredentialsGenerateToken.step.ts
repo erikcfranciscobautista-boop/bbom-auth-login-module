@@ -1,9 +1,9 @@
 import {
     AuthLoginLogger,
     PostBurmCredentialTokensPort
-} from '../../contract/authLogin.contract.js';
-import { AuthLoginErrorService } from '../../errors/authLogin.errors.js';
-import { PermissionItem } from './bcpmPermissionsRoleId.step.js';
+} from '../../contract/index.contract.js';
+import { AuthLoginErrorService } from '../../errors/index.errors.js';
+import type { PermissionItem } from './index.steps.js';
 
 interface JStepBurmCredentialsGenerateTokenOptions {
     burmUserId: string;

@@ -1,9 +1,9 @@
 import {
     AuthLoginLogger,
     GetBcpmStatusesOnePort
-} from '../../contract/authLogin.contract.js';
-import { AuthLoginErrorService, AuthLoginErrorValidationBcpm } from '../../errors/authLogin.errors.js';
-import { getStatusCode } from '../utils/getStatusCode.util.js';
+} from '../../contract/index.contract.js';
+import { AuthLoginErrorService, AuthLoginErrorValidationBcpm } from '../../errors/index.errors.js';
+import { getStatusCode } from '../utils/index.utils.js';
 
 interface JStepBcpmStatusesStatusIdOptions {
     bcpmStatusId: string;

@@ -1,10 +1,10 @@
-import { AuthLoginInDto } from '../../dto/authLogin.in.dto.js';
+import { type AuthLoginInDto } from '../../dto/index.dto.js';
 import {
     AuthLoginLogger,
     GetBurmUserProfileIdentifiersUniquePort
-} from '../../contract/authLogin.contract.js';
-import { AuthLoginErrorService, AuthLoginErrorValidationBurm } from '../../errors/authLogin.errors.js';
-import { getStatusCode } from '../utils/getStatusCode.util.js';
+} from '../../contract/index.contract.js';
+import { AuthLoginErrorService, AuthLoginErrorValidationBurm } from '../../errors/index.errors.js';
+import { getStatusCode } from '../utils/index.utils.js';
 
 interface JstepBurmUserProfileIdentifiersUniqueOptions {
     request: AuthLoginInDto;

@@ -1,12 +1,14 @@
 import Fastify from 'fastify';
 import { authLogin } from '../src/index.js';
 import type { AuthLoginContract } from '../src/index.js';
-import { AuthLoginErrorRequest, AuthLoginErrorService } from '../src/errors/authLogin.errors.js';
-import { mockPostBurmCredentialTokensOKPort } from './mocks/generateToken.js';
-import { mockGetBurmUserProfileIdentifiersUniqueOKPort } from './mocks/profileidentifier.js';
-import { mockPostBurmCredentialValidationsOKPort } from './mocks/validations.js';
-import { mockGetBcpmRolePermissionsListOKPort } from './mocks/permissions.js';
-import { mockGetBcpmStatusesOneOKPort } from './mocks/statuses.js';
+import { AuthLoginErrorRequest, AuthLoginErrorService } from '../src/errors/index.errors.js';
+import {
+    mockGetBcpmRolePermissionsListOKPort,
+    mockGetBcpmStatusesOneOKPort,
+    mockGetBurmUserProfileIdentifiersUniqueOKPort,
+    mockPostBurmCredentialTokensOKPort,
+    mockPostBurmCredentialValidationsOKPort
+} from './mocks/index.mocks.js';
 
 const fastify = Fastify({ logger: true });
 

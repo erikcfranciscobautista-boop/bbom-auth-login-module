@@ -1,9 +1,9 @@
-import { AuthLoginError } from "./authLogin.error.js";
+import { AuthLoginError } from "./index.error.js";
 import { 
     BBOM_LOGIN_VALIDATIONS_FORMAT,
     BBOM_LOGIN_INTERNAL_SERVER_ERROR,
     BBOM_LOGIN_UNAUTHORIZED
-} from "./constants/authLoginTrace.error.js";
+} from "./constants/index.constants.js";
 
 export const AuthLoginErrorRequest = new AuthLoginError(
     400,
