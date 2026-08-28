@@ -1,19 +1,17 @@
 export class AuthLoginError {
-    errorType: string;
-    errorCode: number;
-    detail: {
-        traceError: string;
+    statusCode: number;
+    statusType: string;
+    details: {
         message: string;
-        missing?: string[];
+        missingFields?: string[];
     };
 
-  constructor(errorType: string, errorCode: number, traceError: string, message: string, missing?: string[]) {
-    this.errorType = errorType;
-    this.errorCode = errorCode;
-    this.detail = {
-      traceError,
+  constructor(statusCode: number, statusType: string, message: string, missingFields?: string[]) {
+    this.statusCode = statusCode;
+    this.statusType = statusType;
+    this.details = {
       message,
-      missing
+      missingFields
     };
   }
 }

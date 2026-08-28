@@ -1,28 +1,32 @@
 import Fastify from 'fastify';
 const fastify = Fastify({ logger: true });
 
-const mockPostBurmCredentialsGenerateTokenOKPort = async (
-    burmUserId: string,
-    bcpmRoleId: string,
-    bcpmDepartmentId: string,
-    permissions: Array<{ resource: string; action: string; scope: string }>
+const mockPostBurmCredentialTokensOKPort = async (
+    payload: {
+        burmUser: { burmUserId: string };
+        burmProfile: { bcpmStatusId: string; bcpmDepartmentId: string; bcpmRoleId: string };
+        bcpmPermissions: Array<{ bcpmPermissionResource: string; bcpmPermissionAction: string; bcpmPermissionScope: string }>;
+    },
+    systemToken: string
 ) => {
-    fastify.log.info(`[Mock BURM Token] Generando token para user: ${burmUserId}`);
-    fastify.log.debug(`[Mock BURM Token] role: ${bcpmRoleId}, department: ${bcpmDepartmentId}, permissions: ${permissions.length}`);
+    fastify.log.info(`[Mock BURM Token] Generando token para user: ${payload.burmUser.burmUserId}`);
+    fastify.log.debug(`[Mock BURM Token] role: ${payload.burmProfile.bcpmRoleId}, department: ${payload.burmProfile.bcpmDepartmentId}, permissions: ${payload.bcpmPermissions.length}, token length: ${systemToken.length}`);
     return {
-        token: `token_mock_${burmUserId}_${bcpmRoleId}_${bcpmDepartmentId}`
+        token: `token_mock_${payload.burmUser.burmUserId}_${payload.burmProfile.bcpmRoleId}_${payload.burmProfile.bcpmDepartmentId}`
     };
 };
 
-const mockPostBurmCredentialsGenerateTokenKoPort = async (
-    burmUserId: string,
-    bcpmRoleId: string,
-    bcpmDepartmentId: string,
-    permissions: Array<{ resource: string; action: string; scope: string }>
+const mockPostBurmCredentialTokensKoPort = async (
+    payload: {
+        burmUser: { burmUserId: string };
+        burmProfile: { bcpmStatusId: string; bcpmDepartmentId: string; bcpmRoleId: string };
+        bcpmPermissions: Array<{ bcpmPermissionResource: string; bcpmPermissionAction: string; bcpmPermissionScope: string }>;
+    },
+    systemToken: string
 ) => {
-    fastify.log.info(`[Mock BURM Token] Generando token para user: ${burmUserId}`);
-    fastify.log.debug(`[Mock BURM Token] role: ${bcpmRoleId}, department: ${bcpmDepartmentId}, permissions: ${permissions.length}`);
+    fastify.log.info(`[Mock BURM Token] Generando token para user: ${payload.burmUser.burmUserId}`);
+    fastify.log.debug(`[Mock BURM Token] role: ${payload.burmProfile.bcpmRoleId}, department: ${payload.burmProfile.bcpmDepartmentId}, permissions: ${payload.bcpmPermissions.length}, token length: ${systemToken.length}`);
     return {};
 };
 
-export { mockPostBurmCredentialsGenerateTokenOKPort, mockPostBurmCredentialsGenerateTokenKoPort };
+export { mockPostBurmCredentialTokensOKPort, mockPostBurmCredentialTokensKoPort };
