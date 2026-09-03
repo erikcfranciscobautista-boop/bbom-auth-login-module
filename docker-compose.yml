@@ -1,9 +1,9 @@
 services:
-  bbom-auth-login-module-localhost:
+  service-login:
     build: 
       context: ./
       dockerfile: Dockerfile
-    container_name: bbom-auth-login-module
+    container_name: container-login
     ports:
       - "3000:3000"
     command: npm run localhost
@@ -17,14 +17,3 @@ services:
         target: /app/src
       - action: rebuild
         path: package.json
-
-  bbom-auth-login-tests:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    command: npm run test:isolated
-    volumes:
-      - .:/app
-      - /app/node_modules
-    profiles:
-      - test

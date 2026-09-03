@@ -1,5 +1,4 @@
-# --- ETAPA 1: BUILDER ---
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 WORKDIR /app
 COPY . /app
 RUN npm cache clean --force
