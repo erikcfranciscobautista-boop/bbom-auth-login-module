@@ -1,56 +1,19 @@
-# bbom-auth-login-module
+# @bauhez/bbom-auth-login-module
 
-Modulo de orquestacion de login BBOM.
+Modulo de orquestacion para el inicio de sesion de BBOM. Valida las credenciales de un usuario, consulta su estado y permisos, y solicita la emision del token de acceso.
 
-Esta guia esta alineada con la implementacion actual en [test/run-local.ts](test/run-local.ts) y con el flujo vigente del modulo.
+## Instalacion
 
-## Flujo Actual
-
-Entrada del front:
-
-```json
-{
-  "username": "string",
-  "password": "string"
-}
+```bash
+npm install @bauhez/bbom-auth-login-module
 ```
 
-Orquestacion interna:
+## Uso
 
-1. `getSystemTokenPort`
-2. `getBurmUserProfileIdentifiersUniquePort`
-3. `postBurmCredentialValidationsPort`
-4. `getBcpmStatusesOnePort`
-5. `getBcpmRolePermissionsListPort`
-6. `postBurmCredentialTokensPort`
-
-Respuesta OK:
-
-```json
-{
-  "token": "string"
-}
-```
-
-## Contrato De Implementacion
-
-Referencia de contrato: [src/contract/authLogin.contract.ts](src/contract/authLogin.contract.ts)
-
-Debes implementar estos puertos:
-
-1. `getBurmUserProfileIdentifiersUniquePort(params, systemToken)`
-2. `postBurmCredentialValidationsPort(burmUserId, burmCredentialPassword, systemToken)`
-3. `getBcpmStatusesOnePort(bcpmStatusId, systemToken)`
-4. `getBcpmRolePermissionsListPort(bcpmRoleId, systemToken)`
-5. `postBurmCredentialTokensPort(payload, systemToken)`
-6. `getSystemTokenPort()`
-
-El modulo recibe `username` y decide internamente si buscar por `email`, `phone` o `nickname` para `unique`.
-
-## Ejemplo De Integracion
+La funcion publica es `authLogin`. Recibe una solicitud y las implementaciones de los puertos que conectan el modulo con los servicios BURM y BCPM.
 
 ```ts
-import { authLogin, type AuthLoginContract } from "@uuaas-bbom/bbom-auth-login-module";
+import { authLogin, type AuthLoginContract } from "@bauhez/bbom-auth-login-module";
 
 const contract: AuthLoginContract = {
   req: {
@@ -58,24 +21,17 @@ const contract: AuthLoginContract = {
     password: "secret"
   },
   ports: {
-    getBurmUserProfileIdentifiersUniquePort: async (params, systemToken) => {
-      return burmClient.getUserProfileIdentifiersUnique(params, systemToken);
-    },
-    postBurmCredentialValidationsPort: async (burmUserId, burmCredentialPassword, systemToken) => {
-      return burmClient.postCredentialValidations({ burmUserId, burmCredentialPassword }, systemToken);
-    },
-    getBcpmStatusesOnePort: async (bcpmStatusId, systemToken) => {
-      return bcpmClient.getStatusesOne(bcpmStatusId, systemToken);
-    },
-    getBcpmRolePermissionsListPort: async (bcpmRoleId, systemToken) => {
-      return bcpmClient.getRolePermissionsList(bcpmRoleId, systemToken);
-    },
-    postBurmCredentialTokensPort: async (payload, systemToken) => {
-      return burmClient.postCredentialTokens(payload, systemToken);
-    },
-    getSystemTokenPort: async () => {
-      return tokenService.getSystemToken();
-    }
+    getSystemTokenPort: () => tokenService.getSystemToken(),
+    getBurmUserProfileIdentifiersUniquePort: (params, systemToken) =>
+      burmClient.getUserProfileIdentifiersUnique(params, systemToken),
+    postBurmCredentialValidationsPort: (burmUserId, password, systemToken) =>
+      burmClient.postCredentialValidations(burmUserId, password, systemToken),
+    getBcpmStatusesOnePort: (bcpmStatusId, systemToken) =>
+      bcpmClient.getStatusesOne(bcpmStatusId, systemToken),
+    getBcpmRolePermissionsListPort: (bcpmRoleId, systemToken) =>
+      bcpmClient.getRolePermissionsList(bcpmRoleId, systemToken),
+    postBurmCredentialTokensPort: (payload, systemToken) =>
+      burmClient.postCredentialTokens(payload, systemToken)
   }
 };
 
@@ -83,85 +39,83 @@ const result = await authLogin(contract);
 console.log(result.token);
 ```
 
-## Matriz De Errores (Vigente)
+La respuesta satisfactoria tiene la forma:
 
-Todos los errores deben salir en este formato:
-
-```json
+```ts
 {
-  "statusCode": 0,
-  "statusType": "STRING",
-  "details": {
-    "message": "STRING"
-  }
+  token: string;
 }
 ```
 
-### BBOM 400
+## Solicitud
 
-```json
+`req` debe contener ambos campos como cadenas no vacias:
+
+```ts
 {
-  "statusCode": 400,
-  "statusType": "BBOM-LOGIN-VALIDATIONS-FORMAT",
-  "details": {
-    "message": "Required fields",
-    "missingFields": ["username", "password"]
-  }
+  username: string;
+  password: string;
 }
 ```
 
-### BBOM 500
+El modulo deduce el tipo de identificador de `username` y realiza la busqueda unica por `email`, `phone` o `nickname`.
 
-```json
-{
-  "statusCode": 500,
-  "statusType": "BBOM-LOGIN-INTERNAL-SERVER-ERROR",
-  "details": {
-    "message": "An error has occurred, try again."
-  }
-}
+## Flujo de autenticacion
+
+1. Obtiene un token de sistema mediante `getSystemTokenPort`.
+2. Busca el perfil de usuario mediante `getBurmUserProfileIdentifiersUniquePort`.
+3. Valida la contrasena mediante `postBurmCredentialValidationsPort`.
+4. Consulta el estado del perfil mediante `getBcpmStatusesOnePort`.
+5. Obtiene los permisos del rol mediante `getBcpmRolePermissionsListPort`.
+6. Solicita el token del usuario mediante `postBurmCredentialTokensPort`.
+
+Para generar el token, el modulo envia el identificador de usuario, los identificadores de estado, departamento y rol, y la lista de permisos devuelta por BCPM.
+
+## Puertos requeridos
+
+Todos los puertos reciben el token de sistema cuando corresponde y devuelven una promesa.
+
+| Puerto | Responsabilidad |
+| --- | --- |
+| `getSystemTokenPort()` | Obtiene el token de sistema. |
+| `getBurmUserProfileIdentifiersUniquePort(params, systemToken)` | Obtiene el usuario y su perfil a partir de un identificador unico. |
+| `postBurmCredentialValidationsPort(burmUserId, password, systemToken)` | Valida las credenciales del usuario. |
+| `getBcpmStatusesOnePort(bcpmStatusId, systemToken)` | Consulta el estado asociado al perfil. |
+| `getBcpmRolePermissionsListPort(bcpmRoleId, systemToken)` | Obtiene los permisos asociados al rol. |
+| `postBurmCredentialTokensPort(payload, systemToken)` | Emite el token de acceso. |
+
+Los tipos del contrato se exportan desde el paquete. La referencia de implementacion es [src/contract/index.contract.ts](src/contract/index.contract.ts).
+
+## Registro
+
+Puedes proporcionar un `logger` opcional en el contrato. Sus metodos opcionales son `info`, `warn`, `error` y `debug`; si no se proporciona, el modulo usa `console`.
+
+```ts
+const contract: AuthLoginContract = {
+  req: { username: "demo@mail.com", password: "secret" },
+  ports,
+  logger: console
+};
 ```
 
-### Unauthorized (BURM y BCPM)
+## Errores
 
-Casos que mapean a 401:
+Si `req` no cumple el formato requerido, `authLogin` rechaza la solicitud. Los errores producidos por los puertos o durante la orquestacion se registran y se propagan al consumidor, que debe adaptarlos a la convencion de errores de su aplicacion.
 
-1. BURM `getBurmUserProfileIdentifiersUnique` -> 404
-2. BURM `postBurmCredentialValidations` -> 400 o 403
-3. BCPM `getBcpmStatusesOne` -> 404
-4. BCPM `getBcpmRolePermissionsList` -> 404
+## Desarrollo local
 
-Respuesta:
-
-```json
-{
-  "statusCode": 401,
-  "statusType": "BBOM-LOGIN-UNAUTHORIZED",
-  "details": {
-    "message": "Invalid credentials."
-  }
-}
-```
-
-## Ejecucion Local (Playground)
-
-Instalar dependencias:
+Instala las dependencias y compila el paquete:
 
 ```bash
 npm install
+npm run build
 ```
 
-Levantar servidor local:
+El playground local expone `POST /auth/login`:
 
 ```bash
 npm run localhost
 ```
-
-Endpoint local:
-
-`POST /auth/login`
-
-Ejemplo:
 
 ```bash
 curl -X POST http://localhost:3000/auth/login \
@@ -169,9 +123,7 @@ curl -X POST http://localhost:3000/auth/login \
   -d '{"username":"localuser","password":"localpass"}'
 ```
 
-## Docker
-
-Levantar playground con docker compose:
+Tambien puede iniciarse con Docker Compose:
 
 ```bash
 docker compose up --build bbom-auth-login-module-localhost
