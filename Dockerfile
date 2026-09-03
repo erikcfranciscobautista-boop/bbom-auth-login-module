@@ -5,4 +5,3 @@ RUN npm cache clean --force
 RUN npm install
 EXPOSE 3000
 CMD ["npm", "run", "localhost"]
-RUN echo " DOCKERFILE LOGGER Exit"
