@@ -1,5 +1,25 @@
-export type { GetBurmUserProfileIdentifiersUniquePort, BurmUserProfileIdentifierUniqueParams } from './burmUserProfileIdentifiersUnique.port.js';
-export type { PostBurmCredentialValidationsPort, BurmCredentialValidationResult } from './burmCredentialValidations.port.js';
-export type { GetBcpmStatusesOnePort } from './bcpmStatusesOne.port.js';
-export type { GetBcpmRolePermissionsListPort } from './bcpmRolePermissionsList.port.js';
-export type { PostBurmCredentialTokensPort } from './burmCredentialTokens.port.js';
+export type {
+    CreateBurmCredentialTokenRequest,
+    CreateBurmCredentialTokenResponse,
+    CreateBurmCredentialTokenPort
+} from './createBurmCredentialToken.port.js';
+export type {
+    GetBcpmRolePermissionsByRolePort,
+    GetBcpmRolePermissionsByRoleRequest,
+    GetBcpmRolePermissionsByRoleResponse
+} from './getBcpmRolePermissionsByRole.port.js';
+export type {
+    GetBcpmStatusValidateActivePort,
+    GetBcpmStatusValidateActiveRequest,
+    GetBcpmStatusValidateActiveResponse
+} from './getBcpmStatusValidateActive.port.js';
+export type {
+    GetBurmCredentialValidationPort,
+    GetBurmCredentialValidationRequest,
+    GetBurmCredentialValidationResponse
+} from './getBurmCredentialValidation.port.js';
+export type {
+    GetBurmUserProfileIdentifierPort,
+    GetBurmUserProfileIdentifierRequest,
+    GetBurmUserProfileIdentifierResponse
+} from './getBurmUserProfileIdentifier.port.js';

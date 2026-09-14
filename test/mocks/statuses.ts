@@ -1,32 +1,25 @@
 import Fastify from 'fastify';
 const fastify = Fastify({ logger: true });
 
-const mockGetBcpmStatusesOneOKPort = async (statusId: string, systemToken: string) => {
-    fastify.log.info(`[Mock BCPM Status] Buscando status para: ${statusId}`);
-    fastify.log.debug(`[Mock BCPM Status] token length: ${systemToken.length}`);
-    return {
-        bcpmStatusId: statusId,
-        bcpmStatusKey: 'ACTIVE',
-        bcpmStatusName: 'Active',
-        bcpmStatusType: 'PROFILE'
-    };
+const mockGetBcpmStatusesOneOKPort = async (
+    input: { bcpmStatusId: string }
+): Promise<{ validated: boolean }> => {
+    fastify.log.info(`[Mock BCPM Status] Buscando status para: ${input.bcpmStatusId}`);
+    return { validated: true };
 };
 
-const mockGetBcpmStatusesOneKoPort = async (statusId: string, systemToken: string) => {
-    fastify.log.info(`[Mock BCPM Status] Buscando status para: ${statusId}`);
-    fastify.log.debug(`[Mock BCPM Status] token length: ${systemToken.length}`);
-    return {};
+const mockGetBcpmStatusesOneKoPort = async (
+    input: { bcpmStatusId: string }
+): Promise<{ validated: boolean }> => {
+    fastify.log.info(`[Mock BCPM Status] Buscando status para: ${input.bcpmStatusId}`);
+    throw { statusCode: 404 };
 };
 
-const mockGetBcpmStatusesOneInactivePort = async (statusId: string, systemToken: string) => {
-    fastify.log.info(`[Mock BCPM Status] Buscando status para: ${statusId}`);
-    fastify.log.debug(`[Mock BCPM Status] token length: ${systemToken.length}`);
-    return {
-        bcpmStatusId: statusId,
-        bcpmStatusKey: 'BLOCKED',
-        bcpmStatusName: 'Blocked',
-        bcpmStatusType: 'PROFILE'
-    };
+const mockGetBcpmStatusesOneInactivePort = async (
+    input: { bcpmStatusId: string }
+): Promise<{ validated: boolean }> => {
+    fastify.log.info(`[Mock BCPM Status] Buscando status para: ${input.bcpmStatusId}`);
+    return { validated: false };
 };
 
 export {

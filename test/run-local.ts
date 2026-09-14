@@ -65,12 +65,11 @@ fastify.setErrorHandler((error, _request, reply) => {
 function buildBaseContract(requestLogger: any): Omit<AuthLoginContract, 'req'> {
     return {
         ports: {
-            getBurmUserProfileIdentifiersUniquePort: mockGetBurmUserProfileIdentifiersUniqueOKPort,
-            postBurmCredentialValidationsPort: mockPostBurmCredentialValidationsOKPort,
-            getBcpmStatusesOnePort: mockGetBcpmStatusesOneOKPort,
-            getBcpmRolePermissionsListPort: mockGetBcpmRolePermissionsListOKPort,
-            postBurmCredentialTokensPort: mockPostBurmCredentialTokensOKPort,
-            getSystemTokenPort: async () => 'system_token_mock'
+            getBurmUserProfileIdentifierPort: mockGetBurmUserProfileIdentifiersUniqueOKPort,
+            getBurmCredentialValidationPort: mockPostBurmCredentialValidationsOKPort,
+            getBcpmStatusValidateActivePort: mockGetBcpmStatusesOneOKPort,
+            getBcpmRolePermissionsByRolePort: mockGetBcpmRolePermissionsListOKPort,
+            createBurmCredentialTokenPort: mockPostBurmCredentialTokensOKPort
         },
         logger: requestLogger
     };

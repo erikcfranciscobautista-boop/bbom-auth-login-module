@@ -1,5 +1,5 @@
-export { jstepBcpmPermissionsRoleId, type PermissionItem } from './bcpmPermissionsRoleId.step.js';
-export { jstepBcpmStatusesStatusId } from './bcpmStatusesStatusId.step.js';
-export { jstepBurmCredentialValidations } from './burmCredentialValidations.step.js';
-export { jstepBurmCredentialsGenerateToken } from './burmCredentialsGenerateToken.step.js';
-export { jstepBurmUserProfileIdentifiersUnique } from './burmUserProfileIdentifiersUnique.step.js';
+export { stepBcpmRolePermissionsByRole } from './getBcpmRolePermissionsByRole.step.js';
+export { stepGetBcpmStatusValidateActive } from './getBcpmStatusValidateActive.step.js';
+export { stepBurmCredentialValidation } from './getBurmCredentialValidation.step.js';
+export { stepBurmCredentialsGenerateToken } from './createBurmCredentialToken.step.js';
+export { stepGetBurmUserProfileIdentifier } from './getBurmUserProfileIdentifier.step.js';

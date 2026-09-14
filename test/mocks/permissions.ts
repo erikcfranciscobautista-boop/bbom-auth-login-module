@@ -1,33 +1,21 @@
 import Fastify from 'fastify';
 const fastify = Fastify({ logger: true });
 
-const mockGetBcpmRolePermissionsListOKPort = async (roleId: string, systemToken: string) => {
-    fastify.log.info(`[Mock BCPM Permissions] Buscando permisos para: ${roleId}`);
-    fastify.log.debug(`[Mock BCPM Permissions] token length: ${systemToken.length}`);
+const mockGetBcpmRolePermissionsListOKPort = async (
+    input: { bcpmRoleId: string }
+): Promise<Array<{ bcpmPermissionResource: string; bcpmPermissionAction: string; bcpmPermissionScope: string }>> => {
+    fastify.log.info(`[Mock BCPM Permissions] Buscando permisos para: ${input.bcpmRoleId}`);
     return [
-        {
-            bcpmPermissionId: 'perm_1',
-            bcpmPermissionResource: 'users',
-            bcpmPermissionAction: 'read',
-            bcpmPermissionScope: 'self',
-            bcpmPermissionIsActive: true,
-            bcpmRolePermissionIsAllowed: true
-        },
-        {
-            bcpmPermissionId: 'perm_2',
-            bcpmPermissionResource: 'sessions',
-            bcpmPermissionAction: 'create',
-            bcpmPermissionScope: 'all',
-            bcpmPermissionIsActive: true,
-            bcpmRolePermissionIsAllowed: true
-        }
+        { bcpmPermissionResource: 'users', bcpmPermissionAction: 'read', bcpmPermissionScope: 'self' },
+        { bcpmPermissionResource: 'sessions', bcpmPermissionAction: 'create', bcpmPermissionScope: 'all' }
     ];
 };
 
-const mockGetBcpmRolePermissionsListKoPort = async (roleId: string, systemToken: string) => {
-    fastify.log.info(`[Mock BCPM Permissions] Buscando permisos para: ${roleId}`);
-    fastify.log.debug(`[Mock BCPM Permissions] token length: ${systemToken.length}`);
-    return [{}];
+const mockGetBcpmRolePermissionsListKoPort = async (
+    input: { bcpmRoleId: string }
+): Promise<Array<{ bcpmPermissionResource: string; bcpmPermissionAction: string; bcpmPermissionScope: string }>> => {
+    fastify.log.info(`[Mock BCPM Permissions] Buscando permisos para: ${input.bcpmRoleId}`);
+    throw { statusCode: 404 };
 };
 
 export { mockGetBcpmRolePermissionsListOKPort, mockGetBcpmRolePermissionsListKoPort };

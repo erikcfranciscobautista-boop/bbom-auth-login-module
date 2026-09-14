@@ -1,9 +1,9 @@
 import type {
-    GetBcpmRolePermissionsListPort,
-    GetBcpmStatusesOnePort,
-    GetBurmUserProfileIdentifiersUniquePort,
-    PostBurmCredentialTokensPort,
-    PostBurmCredentialValidationsPort
+    CreateBurmCredentialTokenPort,
+    GetBcpmRolePermissionsByRolePort,
+    GetBcpmStatusValidateActivePort,
+    GetBurmCredentialValidationPort,
+    GetBurmUserProfileIdentifierPort
 } from './ports/index.ports.js';
 
 export interface AuthLoginLogger {
@@ -16,22 +16,33 @@ export interface AuthLoginLogger {
 export interface AuthLoginContract {
     req: unknown;
     ports: {
-        getBurmUserProfileIdentifiersUniquePort: GetBurmUserProfileIdentifiersUniquePort;
-        postBurmCredentialValidationsPort: PostBurmCredentialValidationsPort;
-        getBcpmStatusesOnePort: GetBcpmStatusesOnePort;
-        getBcpmRolePermissionsListPort: GetBcpmRolePermissionsListPort;
-        postBurmCredentialTokensPort: PostBurmCredentialTokensPort;
-        getSystemTokenPort: () => Promise<string>;
+        getBurmUserProfileIdentifierPort: GetBurmUserProfileIdentifierPort;
+        getBurmCredentialValidationPort: GetBurmCredentialValidationPort;
+        getBcpmStatusValidateActivePort: GetBcpmStatusValidateActivePort;
+        getBcpmRolePermissionsByRolePort: GetBcpmRolePermissionsByRolePort;
+        createBurmCredentialTokenPort: CreateBurmCredentialTokenPort;
     };
     logger?: AuthLoginLogger;
 }
 
 export type {
-    GetBurmUserProfileIdentifiersUniquePort,
-    BurmUserProfileIdentifierUniqueParams,
-    PostBurmCredentialValidationsPort,
-    BurmCredentialValidationResult,
-    GetBcpmStatusesOnePort,
-    GetBcpmRolePermissionsListPort,
-    PostBurmCredentialTokensPort
+    CreateBurmCredentialTokenPort,
+    CreateBurmCredentialTokenRequest,
+    CreateBurmCredentialTokenResponse,
+    
+    GetBcpmRolePermissionsByRolePort,
+    GetBcpmRolePermissionsByRoleRequest,
+    GetBcpmRolePermissionsByRoleResponse,
+    
+    GetBcpmStatusValidateActivePort,
+    GetBcpmStatusValidateActiveRequest,
+    GetBcpmStatusValidateActiveResponse,
+    
+    GetBurmCredentialValidationPort,
+    GetBurmCredentialValidationRequest,
+    GetBurmCredentialValidationResponse,
+    
+    GetBurmUserProfileIdentifierPort,
+    GetBurmUserProfileIdentifierRequest,
+    GetBurmUserProfileIdentifierResponse
 } from './ports/index.ports.js';

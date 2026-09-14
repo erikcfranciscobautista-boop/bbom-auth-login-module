@@ -4,37 +4,37 @@ import { type AuthLoginInDto, type AuthLoginOutDto } from '../dto/index.dto.js';
 import {
     AuthLoginContract,
     AuthLoginLogger,
-    GetBcpmRolePermissionsListPort,
-    GetBcpmStatusesOnePort,
-    GetBurmUserProfileIdentifiersUniquePort,
-    PostBurmCredentialTokensPort,
-    PostBurmCredentialValidationsPort
+    CreateBurmCredentialTokenPort,
+    GetBcpmRolePermissionsByRolePort,
+    GetBcpmStatusValidateActivePort,
+    GetBcpmStatusValidateActiveResponse,
+    GetBurmCredentialValidationPort,
+    GetBurmUserProfileIdentifierPort
 } from '../contract/index.contract.js';
-// errors
 import {
-    jstepBcpmPermissionsRoleId,
-    jstepBcpmStatusesStatusId,
-    jstepBurmCredentialValidations,
-    jstepBurmCredentialsGenerateToken,
-    jstepBurmUserProfileIdentifiersUnique
+    stepBcpmRolePermissionsByRole,
+    stepGetBcpmStatusValidateActive,
+    stepBurmCredentialValidation,
+    stepBurmCredentialsGenerateToken,
+    stepGetBurmUserProfileIdentifier
 } from './stepts/index.steps.js';
+import { AuthLoginErrorUnauthorized } from '../errors/authLogin.errors.js';
+import { AuthLoginError } from '../errors/index.errors.js';
 
 export class AuthLoginService {
-    private burmUserProfileIdentifiersUnique : GetBurmUserProfileIdentifiersUniquePort;
-    private burmCredentialValidations : PostBurmCredentialValidationsPort;
-    private bcpmStatusesOne : GetBcpmStatusesOnePort;
-    private bcpmRolePermissionsList : GetBcpmRolePermissionsListPort;
-    private burmCredentialTokens : PostBurmCredentialTokensPort;
-    private getSystemToken: () => Promise<string>;
+    private burmUserProfileIdentifier : GetBurmUserProfileIdentifierPort;
+    private burmCredentialValidation : GetBurmCredentialValidationPort;
+    private bcpmStatusValidateActive : GetBcpmStatusValidateActivePort;
+    private bcpmRolePermissionsByRole : GetBcpmRolePermissionsByRolePort;
+    private burmCredentialToken : CreateBurmCredentialTokenPort;
     private logger : AuthLoginLogger;
 
     constructor(options : AuthLoginContract) {
-        this.burmUserProfileIdentifiersUnique = options.ports.getBurmUserProfileIdentifiersUniquePort;
-        this.burmCredentialValidations = options.ports.postBurmCredentialValidationsPort;
-        this.bcpmStatusesOne = options.ports.getBcpmStatusesOnePort;
-        this.bcpmRolePermissionsList = options.ports.getBcpmRolePermissionsListPort;
-        this.burmCredentialTokens = options.ports.postBurmCredentialTokensPort;
-        this.getSystemToken = options.ports.getSystemTokenPort;
+        this.burmUserProfileIdentifier = options.ports.getBurmUserProfileIdentifierPort;
+        this.burmCredentialValidation = options.ports.getBurmCredentialValidationPort;
+        this.bcpmStatusValidateActive = options.ports.getBcpmStatusValidateActivePort;
+        this.bcpmRolePermissionsByRole = options.ports.getBcpmRolePermissionsByRolePort;
+        this.burmCredentialToken = options.ports.createBurmCredentialTokenPort;
         this.logger = options.logger ?? console;
     }
 
@@ -43,54 +43,59 @@ export class AuthLoginService {
             this.logger.info('-----------------------------------------------------');
             this.logger.info(`start - executeAuthLoginService `);
             this.logger.info('-----------------------------------------------------');
-            const systemToken = await this.getSystemToken();
 
-            const profileIdentifier = await jstepBurmUserProfileIdentifiersUnique({
-                request,
-                getBurmUserProfileIdentifiersUnique: this.burmUserProfileIdentifiersUnique,
-                systemToken,
-                logger: this.logger
-            });
+            const username = {username: request.username};
 
-            await jstepBurmCredentialValidations({
-                burmUserId: profileIdentifier.burmUserId,
-                burmCredentialPassword: request.password,
-                postBurmCredentialValidations: this.burmCredentialValidations,
-                systemToken,
-                logger: this.logger
-            });
+            const profileIdentifier = await stepGetBurmUserProfileIdentifier(
+                username,
+                this.burmUserProfileIdentifier,
+                this.logger
+            );
 
-            await jstepBcpmStatusesStatusId({
-                bcpmStatusId: profileIdentifier.bcpmStatusId,
-                getBcpmStatusesOne: this.bcpmStatusesOne,
-                systemToken,
-                logger: this.logger
-            });
+            await stepBurmCredentialValidation(
+                request.username,
+                {
+                    burmUserId: profileIdentifier.burmUser.burmUserId,
+                    burmCredentialPassword: request.password,
+                },
+                this.burmCredentialValidation,
+                this.logger
+            );
 
-            const permissions = await jstepBcpmPermissionsRoleId({
-                bcpmRoleId: profileIdentifier.bcpmRoleId,
-                getBcpmRolePermissionsList: this.bcpmRolePermissionsList,
-                systemToken,
-                logger: this.logger
-            });
+            const resultStatusValidated = await stepGetBcpmStatusValidateActive(
+                request.username,
+                {
+                    bcpmStatusId: profileIdentifier.burmProfile.bcpmStatusId
+                },
+                this.bcpmStatusValidateActive,
+                this.logger
+            );
 
-            const token = await jstepBurmCredentialsGenerateToken({
-                burmUserId: profileIdentifier.burmUserId,
-                bcpmStatusId: profileIdentifier.bcpmStatusId,
-                bcpmRoleId: profileIdentifier.bcpmRoleId,
-                bcpmDepartmentId: profileIdentifier.bcpmDepartmentId,
-                permissions,
-                postBurmCredentialTokens: this.burmCredentialTokens,
-                systemToken,
-                logger: this.logger
-            });
+            const permissions = await stepBcpmRolePermissionsByRole(
+                request.username,
+                {
+                    bcpmRoleId: profileIdentifier.burmProfile.bcpmRoleId
+                },
+                this.bcpmRolePermissionsByRole,
+                this.logger
+            );
+
+
+            const token = await stepBurmCredentialsGenerateToken(
+                request.username,
+                {
+                    burmUser : profileIdentifier.burmUser,
+                    burmProfile : profileIdentifier.burmProfile,
+                    bcpmPermissions: permissions,
+                },
+                this.burmCredentialToken,
+                this.logger
+            );
 
             this.logger.info('-----------------------------------------------------');
             this.logger.info(`end - OK - executeAuthLoginService `);
             this.logger.info('-----------------------------------------------------');
-            return {
-                token: token
-            }
+            return token;
         } catch (error) {
             this.logger.error(error);
             this.logger.info('-----------------------------------------------------');
