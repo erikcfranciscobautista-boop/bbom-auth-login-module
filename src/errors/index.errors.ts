@@ -1,8 +1,7 @@
 export { AuthLoginError } from './index.error.js';
 export {
     AuthLoginErrorRequest,
-    AuthLoginErrorValidationBurm,
-    AuthLoginErrorValidationBcpm,
-    AuthLoginErrorService
+    AuthLoginErrorService,
+    AuthLoginErrorUnauthorized
 } from './authLogin.errors.js';
 export * from './constants/index.constants.js';

@@ -5,6 +5,5 @@ export { AuthLoginSwagger } from './swagger/index.swagger.js';
 export {
 	AuthLoginErrorRequest,
 	AuthLoginErrorService,
-	AuthLoginErrorValidationBurm,
-	AuthLoginErrorValidationBcpm
+	AuthLoginErrorUnauthorized
 } from './errors/index.errors.js';

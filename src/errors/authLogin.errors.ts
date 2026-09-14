@@ -12,13 +12,7 @@ export const AuthLoginErrorRequest = new AuthLoginError(
     ["username", "password"]
 );
 
-export const AuthLoginErrorValidationBurm = new AuthLoginError(
-    401,
-    BBOM_LOGIN_UNAUTHORIZED,
-    "Invalid credentials.",
-);
-
-export const AuthLoginErrorValidationBcpm = new AuthLoginError(
+export const AuthLoginErrorUnauthorized = new AuthLoginError(
     401,
     BBOM_LOGIN_UNAUTHORIZED,
     "Invalid credentials.",
