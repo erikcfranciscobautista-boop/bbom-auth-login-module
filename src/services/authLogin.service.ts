@@ -62,7 +62,7 @@ export class AuthLoginService {
                 this.logger
             );
 
-            const resultStatusValidated = await stepGetBcpmStatusValidateActive(
+            await stepGetBcpmStatusValidateActive(
                 request.username,
                 {
                     bcpmStatusId: profileIdentifier.burmProfile.bcpmStatusId
