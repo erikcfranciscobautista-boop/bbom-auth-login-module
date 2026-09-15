@@ -10,6 +10,7 @@ build/
 out/
 .output/
 *.tsbuildinfo
+.github/
 
 # --- Logs & Diagnostics ---
 logs/
